@@ -1,0 +1,40 @@
+{% load static %}
+{% load url_utils %}
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Library Technical Inventory</title>
+<link rel="stylesheet" href="{% static 'libtekticket/libtekticket.css' %}">
+</head>
+<body>
+{% block menu %}
+<div class="menu menu-top">
+  <div class="menu-item menu-item-home">Home</div>
+  <div class="menu-item"><a href="{% url 'libtekticket:ticket-list' %}">Tickets</a></div>
+  {% url_if 'profile' as url_if %}
+  {% if user.username %}
+    <div class="menu-item">
+      {% if url_if > '' %}
+        <a href="{{ url_if }}">{{ user.username }}</a>
+      {% else %}
+        {{ user.username }}
+      {% endif %}
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  {% else %}
+    <div class="menu-item"><a href="{% url 'login' %}">Login</a></div>
+  {% endif %}
+  {% if user.is_staff %}
+    <div class='menu-item'>
+      <a href="{% url 'admin:app_list' 'libtekticket' %}..">
+        admin
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+{% block content %}{% endblock %}
+{% block bottomscript %}{% endblock %}
+</body>
+</html>

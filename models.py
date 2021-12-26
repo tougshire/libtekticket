@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from datetime import date
 from django.apps import apps
+from libtekin.models import Item, Location
 
 class Technician(models.Model):
     user = models.ForeignKey(
@@ -20,11 +21,18 @@ class Technician(models.Model):
 
 class Ticket(models.Model):
     item = models.ForeignKey(
-        settings.LIBTEKTICKET_ITEM,
+        Item,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='The item to which this ticket applies'
+        help_text='The item to which this ticket applies - leave blank if not applicable you have trouble finding it'
+    )
+    location = models.ForeignKey(
+        Location,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text='The location leave blank if not applicable or you have trouble finding it'
     )
     description = models.TextField(
         'Description',
@@ -34,11 +42,11 @@ class Ticket(models.Model):
     urgency = models.IntegerField(
         'Urgency',
         choices=(
-             (1, 'Safety Hazard or Work Stoppage'),
-            (2, ''),
-            (3, 'Important Issue'),
-            (4, ''),
-            (5, 'Minor Issue or Suggestion')
+            (1, '1) Safety Hazard or Work Stoppage'),
+            (2, '2'),
+            (3, '3) Important Issue'),
+            (4, '4'),
+            (5, '5) Minor Issue or Suggestion')
         ),
         help_text='The urgency, on a scale of 1 to 5, where 1 is the most urgent'
     )
@@ -52,16 +60,19 @@ class Ticket(models.Model):
     technician = models.ForeignKey(
         Technician,
         verbose_name='technician',
+        blank=True,
         null=True,
         on_delete=models.SET_NULL,
         help_text='The technician responsible for responding to this ticket'
     )
+
 class TicketNote(models.Model):
+
     ticket=models.ForeignKey(
         Ticket,
         on_delete=models.CASCADE,
         help_text='The ticket to which this note applies',
-    ),
+    )
     text = models.TextField(
         'text',
         help_text='The text of the note'
@@ -122,7 +133,7 @@ class History(models.Model):
         new_value_trunc = self.new_value[:17:]+'...' if len(self.new_value) > 20 else self.new_value
 
         try:
-            model = apps.get_model('libtekin', self.modelname)
+            model = apps.get_model('libtekticket', self.modelname)
             object = model.objects.get(pk=self.objectid)
             return f'{self.when.strftime("%Y-%m-%d")}: {self.modelname}: [{object}] [{self.fieldname}] changed to "{new_value_trunc}"'
 

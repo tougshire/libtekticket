@@ -1,0 +1,37 @@
+  <h2>{{ object }}</h2>
+
+  <div class="detail">
+    {% include './_detail_field.html' with label=ticket_labels.common_name field=object.common_name %}
+    {% include './_detail_field.html' with label=ticket_labels.mmodel field=object.mmodel %}
+    {% include './_detail_field.html' with label=ticket_labels.primary_id field=object.primary_id %}
+    {% include './_detail_field.html' with label=ticket_labels.serial_number field=object.serial_number %}
+    {% include './_detail_field.html' with label=ticket_labels.service_number field=object.service_number %}
+    {% include './_detail_field.html' with label=ticket_labels.asset_number field=object.asset_number %}
+    {% include './_detail_field.html' with label=ticket_labels.barcode field=object.barcode %}
+    {% include './_detail_field.html' with label=ticket_labels.network_name field=object.network_name %}
+    {% include './_detail_field.html' with label=ticket_labels.condition field=object.condition %}
+    {% include './_detail_field.html' with label=ticket_labels.home field=object.home %}
+    {% include './_detail_field.html' with label=ticket_labels.location field=object.location %}
+    {% include './_detail_field.html' with label=ticket_labels.assignee field=object.assignee %}
+    {% include './_detail_field.html' with label=ticket_labels.borrower field=object.borrower %}
+    {% include './_detail_field.html' with label=ticket_labels.owner field=object.owner %}
+    {% include './_detail_field.html' with label=ticket_labels.latest_inventory field=object.latest_inventory %}
+
+    <h3>Notes</h3>
+    {% for ticketnote in object.ticketnote_set.all %}
+      <div class="relatedset relatedticketnote" id="div_ticketnote-{{ forloop.counter0 }}">
+        <div class="fieldWrapper">
+          <div class="control">
+            <div class="label">
+              Note:
+            </div>
+            <div class="field">
+              {{ ticketnote.subject }}: {{ ticketnote.text }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+

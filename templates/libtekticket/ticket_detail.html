@@ -1,0 +1,13 @@
+{% extends './_base.html' %}
+{% block content %}
+
+  {% include './ticket_detail_include.html' %}
+
+  <div>
+  <a href="{% url 'libtekticket:ticket-update' object.pk %}">Edit</a>
+  </div>
+  <div>
+  </div  <div>
+  <a href="{% url 'libtekticket:ticket-delete' object.pk %}">Delete</a>
+  </div>
+{% endblock %}

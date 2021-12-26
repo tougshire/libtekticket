@@ -1,0 +1,10 @@
+{% extends './_base.html' %}
+{% block content %}
+  {% include './ticket_detail_include.html' %}
+<form method="POST">
+{% csrf_token %}
+<div>
+Delete? {{ form.is_deleted }}
+<button type="submit">Confirm</button>
+</div>
+{% endblock %}

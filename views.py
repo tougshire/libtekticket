@@ -1,17 +1,21 @@
 import json
 
+from django.apps import AppConfig
+from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import FieldError, ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
-from django.core.exceptions import FieldError, ObjectDoesNotExist
-from .forms import EntityForm, TicketForm, TicketNoteForm, TicketTicketNoteFormSet
-from .models import Ticket, TicketNote, History
 from tougshire_vistas.models import Vista
-from django.apps import AppConfig
-from django.conf import settings
+
+from .forms import TicketForm, TicketNoteForm, TicketTicketNoteFormSet
+from .models import History, Ticket, TicketNote
+
+from libtekin.models import Item
 
 def update_history(form, modelname, object, user):
     for fieldname in form.changed_data:
@@ -32,7 +36,7 @@ def update_history(form, modelname, object, user):
         history.save()
 
 class TicketCreate(PermissionRequiredMixin, CreateView):
-    permission_required = 'libtekin.add_ticket'
+    permission_required = 'libtekticket.add_ticket'
     model = Ticket
     form_class = TicketForm
 
@@ -71,15 +75,16 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
         return response
 
     def get_success_url(self):
+
         if 'opener' in self.request.POST and self.request.POST['opener'] > '':
-            return reverse_lazy('libtekin:item-close', kwargs={'pk': self.object.pk})
+            return reverse_lazy('libtekticket:ticket-close', kwargs={'pk': self.object.pk})
         else:
-            return reverse_lazy('libtekin:item-detail', kwargs={'pk': self.object.pk})
+            return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': self.object.pk})
 
 
 
 class TicketUpdate(PermissionRequiredMixin, UpdateView):
-    permission_required = 'libtekin.change_ticket'
+    permission_required = 'libtekticket.change_ticket'
     model = Ticket
     form_class = TicketForm
 
@@ -94,8 +99,13 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
 
     def form_valid(self, form):
 
-        if 'copy' in self.request.POST:
-            form.instance.pk=None
+        send_mail(
+            'Subject here',
+            'Here is the message.',
+            'from@example.com',
+            ['benjamin@bnmng.com'],
+            fail_silently=False,
+        )
 
         update_history(form, 'Item', form.instance, self.request.user)
 
@@ -118,11 +128,11 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
         return response
 
     def get_success_url(self):
-        return reverse_lazy('libtekin:item-detail', kwargs={ 'pk':self.object.pk })
+        return reverse_lazy('libtekticket:tiket-detail', kwargs={ 'pk':self.object.pk })
 
 
 class TicketDetail(PermissionRequiredMixin, DetailView):
-    permission_required = 'libtekin.view_ticket'
+    permission_required = 'libtekticket.view_ticket'
     model = Ticket
 
     def get_context_data(self, **kwargs):
@@ -134,15 +144,15 @@ class TicketDetail(PermissionRequiredMixin, DetailView):
         return context_data
 
 class TicketDelete(PermissionRequiredMixin, UpdateView):
-    permission_required = 'libtekin.delete_ticket'
+    permission_required = 'libtekticket.delete_ticket'
     model = Ticket
-    success_url = reverse_lazy('libtekin:item-list')
+    success_url = reverse_lazy('libtekticket:ticket-list')
 
 class TicketSoftDelete(PermissionRequiredMixin, UpdateView):
-    permission_required = 'libtekin.delete_ticket'
+    permission_required = 'libtekticket.delete_ticket'
     model = Ticket
-    template_name = 'libtekin/item_confirm_delete.html'
-    success_url = reverse_lazy('libtekin:item-list')
+    template_name = 'libtekticket/item_confirm_delete.html'
+    success_url = reverse_lazy('libtekticket:ticket-list')
     fields = ['is_deleted']
 
     def get_context_data(self, **kwargs):
@@ -155,13 +165,13 @@ class TicketSoftDelete(PermissionRequiredMixin, UpdateView):
         return context_data
 
 class TicketList(PermissionRequiredMixin, ListView):
-    permission_required = 'libtekin.view_ticket'
+    permission_required = 'libtekticket.view_ticket'
     model = Ticket
     filter_object = {}
     exclude_object = {}
     order_by = []
     order_by_fields=[]
-    for fieldname in ['common_name', 'mmodel', 'primary_id', 'serial_number','service_number']:
+    for fieldname in ['item', 'urgency']:
         order_by_fields.append(
             { 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title() }
         )
@@ -284,7 +294,7 @@ class TicketList(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['items'] = AppConfig.get_model(settings.LIBTEKTICKET_ITEM).objects.all()
+        context_data['items'] = Item.objects.all()
         context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekticket.ticket').all()
         context_data['order_by_fields'] = self.order_by_fields
 

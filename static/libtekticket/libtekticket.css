@@ -1,0 +1,139 @@
+.hidden {
+    display:none;
+}
+
+.menu-top {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 1px 1px;
+}
+
+.form .formset {
+    margin-left:2em;
+}
+
+.form .field-wrapper {
+    margin-top:.5em;
+}
+
+.form .control {
+    display:flex;
+}
+
+.form .label {
+    width:15%;
+}
+
+.form .help_text {
+    margin-left:15%;
+}
+.list {
+    width:100%;
+    display:table;
+}
+.list .row {
+    display:table-row
+}
+.list .rowhead {
+    background-color:#eeeeff;
+}
+
+.list .field {
+    display:table-cell;
+    border: 1px solid lightblue;
+    padding-left: .2em;
+    padding-right: .2em;
+}
+.list .rowhead .field {
+    border:1px solid blue;
+}
+.list .field::after {
+    content: "\00a0"
+}
+
+.viewform .viewformset {
+    margin-left:2em;
+}
+
+.viewform .field-wrapper {
+    margin-top:.5em;
+}
+
+.viewform .control {
+    display:flex;
+}
+
+.viewform .label {
+    width:15%;
+}
+
+.viewform .help_text {
+    margin-left:15%;
+}
+
+.viewform .viewformset {
+    margin-left:2em;
+}
+
+.viewform .field-wrapper {
+    margin-top:.5em;
+}
+
+.viewform .control {
+    display:flex;
+}
+
+.viewform .label {
+    width:15%;
+}
+
+.viewform .help_text {
+    margin-left:15%;
+}
+
+.detail .detailset {
+    margin-left:2em;
+}
+
+.detail .field-wrapper {
+    margin-top:.5em;
+}
+
+.detail .control {
+    display:flex;
+}
+
+.detail .label {
+    width:15%;
+}
+
+.detail .help_text {
+    margin-left:15%;
+}
+
+
+
+
+
+.relatedset {
+    margin-left:2em;
+}
+
+
+
+/* Font, spacing, */
+.menu a {
+    text-decoration: none;
+}
+
+/* Colors */
+.menu {
+    color: white;
+    background-color:cornflowerblue;
+}
+
+.menu a:link, .menu a:visited {
+    color:white;
+}
+
