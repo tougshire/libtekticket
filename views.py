@@ -12,9 +12,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from tougshire_vistas.models import Vista
-
+from django.contrib.auth import get_user_model
 from .forms import TicketForm, TicketNoteForm, TicketTicketNoteFormSet
-from .models import History, Ticket, TicketNote
+from .models import Technician, History, Ticket, TicketNote
 
 from libtekin.models import Item
 
@@ -76,10 +76,10 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
                 print( form.errors )
 
         send_mail(
-            form.cleaned_data('short_description'),
-            form.cleaned_data('description'),
-            self.request.user[get_email_field_name],
-            ','.join([tech.user[get_email_field_name] for tech in Technician.objects.all() ]),
+            form.cleaned_data['short_description'],
+            form.cleaned_data['description'],
+            self.request.user.email,
+            ','.join([tech.user.email for tech in Technician.objects.all() ]),
             fail_silently=False,
         )
 

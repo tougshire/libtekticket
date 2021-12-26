@@ -15,6 +15,7 @@ class TicketForm(ModelForm):
         fields = [
             'item',
             'location',
+            'short_description',
             'description',
             'urgency',
             'technician',
