@@ -34,6 +34,11 @@ class Ticket(models.Model):
         blank=True,
         help_text='The location leave blank if not applicable or you have trouble finding it'
     )
+    short_description = models.CharField(
+        'Short Description',
+        max_length=75,
+        help_text='A short description of the issue',
+    )
     description = models.TextField(
         'Description',
         blank=True,
@@ -70,6 +75,9 @@ class Ticket(models.Model):
         blank=True,
         help_text='How the problem was resolved'
     )
+
+    def __str__(self):
+        return self.short_description
 
 class TicketNote(models.Model):
 
