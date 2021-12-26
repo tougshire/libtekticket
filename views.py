@@ -55,6 +55,8 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
 
         response = super().form_valid(form)
 
+        form.cleaned_data['submitted_by'] = self.request.user
+
         update_history(form, 'Item', form.instance, self.request.user)
 
         self.object = form.save()
