@@ -2,9 +2,10 @@ import json
 
 from django.apps import AppConfig
 from django.conf import settings
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import FieldError, ObjectDoesNotExist
 from django.core.mail import send_mail
+from django.db.models.fields import EmailField
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
@@ -74,6 +75,14 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
             for form in ticketnotes.forms:
                 print( form.errors )
 
+        send_mail(
+            form.cleaned_data('short_description'),
+            form.cleaned_data('description'),
+            self.request.user[get_email_field_name],
+            ','.join([tech.user[get_email_field_name] for tech in Technician.objects.all() ]),
+            fail_silently=False,
+        )
+
         return response
 
     def get_success_url(self):
@@ -83,12 +92,11 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
         else:
             return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': self.object.pk})
 
-
-
 class TicketUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'libtekticket.change_ticket'
     model = Ticket
     form_class = TicketForm
+
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -100,14 +108,6 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
         return context_data
 
     def form_valid(self, form):
-
-        send_mail(
-            'Subject here',
-            'Here is the message.',
-            'from@example.com',
-            ['benjamin@bnmng.com'],
-            fail_silently=False,
-        )
 
         update_history(form, 'Item', form.instance, self.request.user)
 

@@ -3,6 +3,7 @@ from django.conf import settings
 from datetime import date
 from django.apps import apps
 from libtekin.models import Item, Location
+from django.contrib.auth import get_user_model
 
 class Technician(models.Model):
     user = models.ForeignKey(
@@ -18,6 +19,11 @@ class Technician(models.Model):
         blank=True,
         help_text='The name of the technician'
     )
+
+    @classmethod
+    def user_is_tech(cls, user):
+        return user.pk in [ technician.user for technician in Technician.objects.all() ]
+
 
 class Ticket(models.Model):
     item = models.ForeignKey(
@@ -78,6 +84,10 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.short_description
+
+    def user_is_editor(self, user):
+        return user == self.submitted_by or Technician.user_is_tech(user)
+
 
 class TicketNote(models.Model):
 
