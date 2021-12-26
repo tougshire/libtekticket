@@ -79,7 +79,7 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
             form.cleaned_data['short_description'],
             form.cleaned_data['description'],
             self.request.user.email,
-            ','.join([tech.user.email for tech in Technician.objects.all() ]),
+            [ tech.user.email for tech in Technician.objects.all() ],
             fail_silently=False,
         )
 
