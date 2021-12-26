@@ -65,6 +65,11 @@ class Ticket(models.Model):
         on_delete=models.SET_NULL,
         help_text='The technician responsible for responding to this ticket'
     )
+    resolution = models.TextField(
+        'Resolution',
+        blank=True,
+        help_text='How the problem was resolved'
+    )
 
 class TicketNote(models.Model):
 
