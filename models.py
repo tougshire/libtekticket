@@ -10,6 +10,7 @@ class Technician(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name='user',
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         help_text='The user account associated with this technician'
     )
@@ -19,6 +20,9 @@ class Technician(models.Model):
         blank=True,
         help_text='The name of the technician'
     )
+
+    def __str__(self):
+        return f"{self.name}: user={self.user}"
 
     @classmethod
     def user_is_tech(cls, user):
