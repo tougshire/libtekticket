@@ -3,11 +3,20 @@
 
   {% include './ticket_detail_include.html' %}
 
-  <div>
-  <a href="{% url 'libtekticket:ticket-update' object.pk %}">Edit</a>
+  <div class="menu-bottom">
+    {% if perms.libtekticket.change_ticket %}
+      <div class="menu-item">
+      <a href="{% url 'libtekticket:ticket-update' object.pk %}">Edit</a>
+      </div>
+      <div class="menu-item">
+      <a href="{% url 'libtekticket:ticket-delete' object.pk %}">Delete</a>
+      </div>
+    {% endif %}
+    {% if ticket.submitted_by.pk == user.pk %}
+      <a href="{% url 'libtekticket:ticketnote-create' ticket.pk %}">Add a note</a>
+    {% endif %}
   </div>
   <div>
   </div  <div>
-  <a href="{% url 'libtekticket:ticket-delete' object.pk %}">Delete</a>
   </div>
 {% endblock %}

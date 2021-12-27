@@ -16,7 +16,7 @@ from django.contrib.auth import get_user_model
 from .forms import TicketForm, TicketNoteForm, TicketTicketNoteFormSet
 from .models import Technician, History, Ticket, TicketNote
 
-from libtekin.models import Item
+from libtekin.models import Item, Mmodel
 
 def update_history(form, modelname, object, user):
     for fieldname in form.changed_data:
@@ -56,9 +56,8 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
 
         response = super().form_valid(form)
 
-        form.cleaned_data['submitted_by'] = self.request.user
-
-        update_history(form, 'Item', form.instance, self.request.user)
+        self.object = form.save(commit=False)
+        self.object.submitted_by = self.request.user
 
         self.object = form.save()
 
@@ -76,10 +75,10 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
                 print( form.errors )
 
         send_mail(
-            form.cleaned_data['short_description'],
-            form.cleaned_data['description'],
+            'Tech Ticket: ' + form.cleaned_data['short_description'],
+            f"Urgency: { self.object.get_urgency_display() }\mItem: { self.object.item }\m{ self.object.description }",
             self.request.user.email,
-            [ tech.user.email for tech in Technician.objects.all() ],
+            [ tech.user.email for tech in Technician.objects.all() ]  + [ self.object.submitted_by.email ] ,
             fail_silently=False,
         )
 
@@ -143,6 +142,7 @@ class TicketDetail(PermissionRequiredMixin, DetailView):
         context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
         context_data['ticketnote_labels'] = { field.name: field.verbose_name.title() for field in TicketNote._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
 
+        context_data['ticketnote_form'] = TicketNoteCreate.form_class
         return context_data
 
 class TicketDelete(PermissionRequiredMixin, UpdateView):
@@ -297,6 +297,8 @@ class TicketList(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data['items'] = Item.objects.all()
+        context_data['mmodels'] = Mmodel.objects.all()
+        context_data['users'] = get_user_model().objects.all()
         context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekticket.ticket').all()
         context_data['order_by_fields'] = self.order_by_fields
 
@@ -314,3 +316,51 @@ class TicketList(PermissionRequiredMixin, ListView):
         context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
 
         return context_data
+
+class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'libtekticket.add_ticket'
+    model = TicketNote
+    form_class = TicketNoteForm
+
+    def test_func(self):
+        try:
+            ticket = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+        except LookupError:
+            return False
+
+        return ticket.user_is_editor(self.request.user)
+
+    def get_context_data(self, **kwargs):
+
+        context_data = super().get_context_data(**kwargs)
+
+        context_data['ticket'] = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+
+        return context_data
+
+    def form_valid(self, form):
+
+
+        ticket = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+
+        self.object = form.save(commit=False)
+        self.object.ticket = ticket
+        self.object = form.save()
+
+        response = super().form_valid(form)
+
+        send_mail(
+            'Tech Ticket Update: ' + ticket.short_description,
+            f"{ self.object.text }",
+            self.request.user.email,
+            [ tech.user.email for tech in Technician.objects.all() ] + [ ticket.submitted_by.email ],
+            fail_silently=False,
+        )
+
+        return response
+
+    def get_success_url(self):
+
+        ticket = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+
+        return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': ticket.pk})

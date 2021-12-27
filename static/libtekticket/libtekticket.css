@@ -9,6 +9,14 @@
     padding: 1px 1px;
 }
 
+.menu-bottom {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 1px 1px;
+}
+
+
 .form .formset {
     margin-left:2em;
 }

@@ -29,7 +29,6 @@ class TicketNoteForm(ModelForm):
     class Meta:
         model = TicketNote
         fields = [
-            'ticket',
             'when',
             'text',
         ]

@@ -41,12 +41,12 @@
       <div class="field-wrapper">
         <div class="control">
           <div class="label">
-            Model is in
+            Item is in
           </div>
           <div class="field">
-            <select multiple name="filter__mmodel__in">
-              {% for mmodel in mmodels %}
-                <option value="{{ mmodel.pk }}"{% if 'mmodel__in' in filter_object %}{% if mmodel.pk|lower in filter_object.mmodel__in %} selected="SELECTED" {% endif %}{% endif %}>{{ mmodel }}</option>
+            <select multiple name="filter__item__in">
+              {% for item in items %}
+                <option value="{{ item.pk }}"{% if 'item__in' in filter_object %}{% if item.pk|lower in filter_object.item__in %} selected="SELECTED" {% endif %}{% endif %}>{{ item }}</option>
               {% endfor %}
             </select>
             <input type="checkbox" name="filter__mmodel__none">
@@ -56,58 +56,30 @@
       <div class="field-wrapper">
         <div class="control">
           <div class="label">
-            Category is in
+            Model is in
           </div>
           <div class="field">
-            <select multiple name="filter__mmodel__category__in">
-              {% for mmodelcategory in mmodelcategories %}
-                <option value="{{ mmodelcategory.pk }}"{% if 'mmodel__category__in' in filter_object %}{% if mmodelcategory.pk|lower in filter_object.mmodel__category__in %} selected="SELECTED" {% endif %}{% endif %}>{{ mmodelcategory }}</option>
+            <select multiple name="filter__item__mmodel__in">
+              {% for mmodel in mmodels %}
+                <option value="{{ mmodel.pk }}"{% if 'item__mmodel__in' in filter_object %}{% if mmodel.pk|lower in filter_object.item__mmodel__in %} selected="SELECTED" {% endif %}{% endif %}>{{ mmodel }}</option>
               {% endfor %}
             </select>
+            <input type="checkbox" name="filter__mmodel__none">
           </div>
         </div>
       </div>
       <div class="field-wrapper">
         <div class="control">
           <div class="label">
-            Role is in
+            Submitter is in
           </div>
           <div class="field">
-            <select multiple name="filter__role__in">
-              {% for role in roles %}
-                <option value="{{ role.pk }}"{% if 'role__in' in filter_object %}{% if role.pk|lower in filter_object.role__in %} selected="SELECTED" {% endif %}{% endif %}>{{ role }}</option>
+            <select multiple name="filter__submitted_by__in">
+              {% for user in users %}
+                <option value="{{ user.pk }}"{% if 'user__in' in filter_object %}{% if user.pk|lower in filter_object.item__user__in %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
               {% endfor %}
             </select>
-            <input type="checkbox" name="filter__role__none" {% if 'role__none' in filter_object %} checked="CHECKED"{% endif %}>No Role
-          </div>
-        </div>
-      </div>
-      <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Condition is in
-          </div>
-          <div class="field">
-            <select multiple name="filter__condition__in">
-              {% for condition in conditions %}
-                <option value="{{ condition.pk }}"{% if 'condition__in' in filter_object %}{% if condition.pk|lower in filter_object.condition__in %} selected="SELECTED" {% endif %}{% endif %}>{{ condition }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Show Fields
-          </div>
-          <div class="field">
-            <select multiple="multiple" name="shown_fields">
-              {% for field in showable_fields %}
-                <option value="{{ field.name }}"{% if field.name in shown_fields %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
-            </select>
+            <input type="checkbox" name="filter__mmodel__none">
           </div>
         </div>
       </div>
@@ -173,53 +145,20 @@
     <div><a href="{% url 'libtekticket:ticket-create' %}">create</a></div>
       <div class="row rowhead">
         {% include './_list_head.html' with field='' %}
-        {% if 'common_name' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.common_name %}
-        {% endif %}
-        {% if 'mmodel' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.mmodel %}
-        {% endif %}
-        {% if 'primary_id' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.primary_id %}
-        {% endif %}
-        {% if 'serial_number' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.serial_number %}
-        {% endif %}
-        {% if 'service_number' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.service_number %}
-        {% endif %}
-        {% if 'asset_number' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.asset_number %}
-        {% endif %}
-        {% if 'barcode' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.barcode %}
-        {% endif %}
-        {% if 'network_name' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.network_name %}
-        {% endif %}
-        {% if 'role' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.role %}
-        {% endif %}
-        {% if 'condition' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.condition %}
-        {% endif %}
-        {% if 'home' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.home %}
+        {% if 'item' in shown_fields or not shown_fields %}
+          {% include './_list_head.html' with field=item_labels.item %}
         {% endif %}
         {% if 'location' in shown_fields or not shown_fields %}
           {% include './_list_head.html' with field=item_labels.location %}
         {% endif %}
-        {% if 'assignee' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.assignee %}
+        {% if 'short_description' in shown_fields or not shown_fields %}
+          {% include './_list_head.html' with field=item_labels.short_description %}
         {% endif %}
-        {% if 'borrower' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.borrower %}
+        {% if 'urgency' in shown_fields or not shown_fields %}
+          {% include './_list_head.html' with field=item_labels.urgency %}
         {% endif %}
-        {% if 'owner' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.owner %}
-        {% endif %}
-        {% if 'latest_inventory' in shown_fields or not shown_fields %}
-          {% include './_list_head.html' with field=item_labels.latest_inventory %}
+        {% if 'submitted_by' in shown_fields or not shown_fields %}
+          {% include './_list_head.html' with field=item_labels.submitted_by %}
         {% endif %}
 
 
@@ -228,53 +167,20 @@
       {% for item in object_list %}
         <div class="row">
           <div class="listfield"><a href="{% url 'libtekticket:ticket-detail' item.pk %}">view</a></div>
-          {% if 'common_name' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.common_name %}
-          {% endif %}
-          {% if 'mmodel' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.mmodel %}
-          {% endif %}
-          {% if 'primary_id' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.primary_id %}
-          {% endif %}
-          {% if 'serial_number' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.serial_number %}
-          {% endif %}
-          {% if 'service_number' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.service_number %}
-          {% endif %}
-          {% if 'asset_number' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.asset_number %}
-          {% endif %}
-          {% if 'barcode' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.barcode %}
-          {% endif %}
-          {% if 'network_name' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.network_name %}
-          {% endif %}
-          {% if 'role' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.role %}
-          {% endif %}
-          {% if 'condition' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.condition %}
-          {% endif %}
-          {% if 'home' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.home.short_name %}
+          {% if 'item' in shown_fields or not shown_fields %}
+            {% include './_list_field.html' with field=item.item %}
           {% endif %}
           {% if 'location' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.location.short_name %}
+            {% include './_list_field.html' with field=item.location %}
           {% endif %}
-          {% if 'assignee' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.assignee.friendly_name %}
+          {% if 'short_description' in shown_fields or not shown_fields %}
+            {% include './_list_field.html' with field=item.short_description %}
           {% endif %}
-          {% if 'borrower' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.borrower.friendly_name %}
+          {% if 'urgency' in shown_fields or not shown_fields %}
+            {% include './_list_field.html' with field=item.urgency %}
           {% endif %}
-          {% if 'owner' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.owner.friendly_name %}
-          {% endif %}
-          {% if 'latest_inventory' in shown_fields or not shown_fields %}
-            {% include './_list_field.html' with field=item.latest_inventory %}
+          {% if 'submitted_by' in shown_fields or not shown_fields %}
+            {% include './_list_field.html' with field=item.submitted_by %}
           {% endif %}
 
         </div>
