@@ -78,7 +78,7 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
             'Tech Ticket: ' + form.cleaned_data['short_description'],
             f"Urgency: { self.object.get_urgency_display() }\mItem: { self.object.item }\m{ self.object.description }",
             self.request.user.email,
-            [ tech.user.email for tech in Technician.objects.all() ]  + [ self.object.submitted_by.email ] ,
+            [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]  + [ self.object.submitted_by.email ] ,
             fail_silently=False,
         )
 
@@ -353,7 +353,7 @@ class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView)
             'Tech Ticket Update: ' + ticket.short_description,
             f"{ self.object.text }",
             self.request.user.email,
-            [ tech.user.email for tech in Technician.objects.all() ] + [ ticket.submitted_by.email ],
+            [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]  + [ self.object.submitted_by.email ] ,
             fail_silently=False,
         )
 
