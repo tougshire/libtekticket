@@ -25,9 +25,11 @@
       <div id="div_urgency">
         {% include './_form_field.html' with field=form.urgency %}
       </div>
-      <div id="div_technician">
-        {% include './_form_field.html' with field=form.technician %}
-      </div>
+      {% if perms.libtekticket.change_ticket %}
+        <div id="div_technician">
+          {% include './_form_field.html' with field=form.technician %}
+        </div>
+      {% endif %}
       <div id="div_service_number">
         {% include './_form_field.html' with field=form.service_number %}
       </div>

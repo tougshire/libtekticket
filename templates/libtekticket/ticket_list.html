@@ -34,7 +34,7 @@
             Quick Search
           </div>
           <div class="field">
-            <input id="ctl_common_text_search" name="common_text_search" value="{{ common_text_search }}">
+            <input id="ctl_combined_text_search" name="combined_text_search" value="{{ combined_text_search }}">
           </div>
         </div>
       </div>
@@ -145,19 +145,19 @@
     <div><a href="{% url 'libtekticket:ticket-create' %}">create</a></div>
       <div class="row rowhead">
         {% include './_list_head.html' with field='' %}
-        {% if 'item' in shown_fields or not shown_fields %}
+        {% if 'item' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=item_labels.item %}
         {% endif %}
-        {% if 'location' in shown_fields or not shown_fields %}
+        {% if 'location' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=item_labels.location %}
         {% endif %}
-        {% if 'short_description' in shown_fields or not shown_fields %}
+        {% if 'short_description' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=item_labels.short_description %}
         {% endif %}
-        {% if 'urgency' in shown_fields or not shown_fields %}
+        {% if 'urgency' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=item_labels.urgency %}
         {% endif %}
-        {% if 'submitted_by' in shown_fields or not shown_fields %}
+        {% if 'submitted_by' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=item_labels.submitted_by %}
         {% endif %}
 
@@ -167,19 +167,19 @@
       {% for item in object_list %}
         <div class="row">
           <div class="listfield"><a href="{% url 'libtekticket:ticket-detail' item.pk %}">view</a></div>
-          {% if 'item' in shown_fields or not shown_fields %}
+          {% if 'item' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.item %}
           {% endif %}
-          {% if 'location' in shown_fields or not shown_fields %}
+          {% if 'location' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.location %}
           {% endif %}
-          {% if 'short_description' in shown_fields or not shown_fields %}
+          {% if 'short_description' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.short_description %}
           {% endif %}
-          {% if 'urgency' in shown_fields or not shown_fields %}
+          {% if 'urgency' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.urgency %}
           {% endif %}
-          {% if 'submitted_by' in shown_fields or not shown_fields %}
+          {% if 'submitted_by' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.submitted_by %}
           {% endif %}
 
@@ -200,7 +200,7 @@
       if( viewDiv.classList.contains('hidden')) {
         btnShowviewform.textContent='Show Sort/Filter Form'
       } else {
-        document.getElementById("ctl_common_text_search").focus()
+        document.getElementById("ctl_combined_text_search").focus()
         btnShowviewform.textContent='Hide Sort/Filter Form'
       }
     }
