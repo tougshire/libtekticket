@@ -146,22 +146,20 @@
       <div class="row rowhead">
         {% include './_list_head.html' with field='' %}
         {% if 'item' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=item_labels.item %}
+          {% include './_list_head.html' with field=ticket_labels.item %}
         {% endif %}
         {% if 'location' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=item_labels.location %}
+          {% include './_list_head.html' with field=ticket_labels.location %}
         {% endif %}
         {% if 'short_description' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=item_labels.short_description %}
+          {% include './_list_head.html' with field=ticket_labels.short_description %}
         {% endif %}
         {% if 'urgency' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=item_labels.urgency %}
+          {% include './_list_head.html' with field=ticket_labels.urgency %}
         {% endif %}
         {% if 'submitted_by' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=item_labels.submitted_by %}
+          {% include './_list_head.html' with field=ticket_labels.submitted_by %}
         {% endif %}
-
-
       </div>
 
       {% for item in object_list %}
@@ -182,7 +180,6 @@
           {% if 'submitted_by' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.submitted_by %}
           {% endif %}
-
         </div>
       {% endfor %}
 

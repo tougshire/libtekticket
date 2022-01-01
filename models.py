@@ -22,12 +22,11 @@ class Technician(models.Model):
     )
 
     def __str__(self):
-        return f"{self.name}: user={self.user}"
+        return f"{self.name}"
 
     @classmethod
     def user_is_tech(cls, user):
         return user.pk in [ technician.user for technician in Technician.objects.all() ]
-
 
 class Ticket(models.Model):
     item = models.ForeignKey(
@@ -100,8 +99,9 @@ class TicketNote(models.Model):
         on_delete=models.CASCADE,
         help_text='The ticket to which this note applies',
     )
-    text = models.TextField(
+    text = models.CharField(
         'text',
+        max_length=255,
         help_text='The text of the note'
     )
     when = models.DateField(

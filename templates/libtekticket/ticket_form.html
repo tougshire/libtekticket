@@ -34,9 +34,8 @@
         {% include './_form_field.html' with field=form.service_number %}
       </div>
 
+      {% include './_form_button.html' with button='<button id="btn_add-tickennote">Add Note</button>' label='Notes' %}
 
-      <h3>Notes</h3>
-      <button id="btn_add-tickennote">Add Note</button>
       <div id="div_insert-ticketnote"></div>
       {{ ticketnotes.management_form }}
       {% for form in ticketnotes.forms %}
@@ -93,66 +92,8 @@
           </div>
         {% endfor %}
       </div>
+      {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit Form</button>' %}
 
-      <h3>Timed Notes</h3>
-      <button id="btn_add-ticketnote">Add Timed Note</button>
-      <div id="div_insert-ticketnote"></div>
-      {{ ticketnotes.management_form }}
-      {% for form in ticketnotes.forms %}
-        <h4>Note</h4>
-        <div class="formset" id="div_ticketnote-{{ forloop.counter0 }}">
-          {{ form.errors }}
-          {% for field in form.hidden_fields %}
-            {{ field }}
-          {% endfor %}
-          {% for field in form.visible_fields%}
-            <div class="fieldWrapper">
-              {% if field.errors %}
-                <div class="errors">
-                  {{ field.errors }}
-                </div>
-              {% endif %}
-              <div class="control">
-                <div class="label">
-                  {{ field.label_tag }}
-                </div>
-                <div class="field">
-                  {{ field }}
-                </div>
-              </div>
-              <div class="help_text">
-                {{ field.help_text}}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% endfor %}
-      <div style="display:none" class="emptyformset" id="div_ticketnote-empty">
-        {% for field in ticketnotes.empty_form.hidden_fields %}
-          {{ field }}
-        {% endfor %}
-        {% for field in ticketnotes.empty_form.visible_fields%}
-          <div class="fieldWrapper">
-            {% if field.errors %}
-              <div class="errors">
-                {{ field.errors }}
-              </div>
-            {% endif %}
-            <div class="control">
-              <div class="label">
-                {{ field.label_tag }}
-              </div>
-              <div class="field">
-                {{ field }}
-              </div>
-            </div>
-            <div class="help_text">
-              {{ field.help_text}}
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-      <button type="submit">Submit</button>
     </div>
   </form>
 {% endblock %}
