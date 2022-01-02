@@ -48,10 +48,10 @@ class Ticket(models.Model):
         max_length=75,
         help_text='A short description of the issue',
     )
-    description = models.TextField(
+    long_description = models.TextField(
         'Description',
         blank=True,
-        help_text='The description of the problem'
+        help_text='The description of the problem if the short description isn\'t adequate'
     )
     urgency = models.IntegerField(
         'Urgency',
@@ -70,6 +70,10 @@ class Ticket(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         help_text='The user who submitted this ticket'
+    )
+    when = models.DateTimeField(
+        auto_now_add=True,
+        help_text='The date and time the ticket was submitted'
     )
     technician = models.ForeignKey(
         Technician,
@@ -91,6 +95,9 @@ class Ticket(models.Model):
     def user_is_editor(self, user):
         return user == self.submitted_by or Technician.user_is_tech(user)
 
+    class Meta:
+        ordering=['-when']
+
 
 class TicketNote(models.Model):
 
@@ -103,6 +110,13 @@ class TicketNote(models.Model):
         'text',
         max_length=255,
         help_text='The text of the note'
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name='submitted by',
+        null=True,
+        on_delete=models.SET_NULL,
+        help_text='The user who submitted this note'
     )
     when = models.DateField(
         'when',

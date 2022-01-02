@@ -20,7 +20,7 @@
         {% include './_form_field.html' with field=form.short_description %}
       </div>
       <div id="div_description">
-        {% include './_form_field.html' with field=form.description %}
+        {% include './_form_field.html' with field=form.long_description %}
       </div>
       <div id="div_urgency">
         {% include './_form_field.html' with field=form.urgency %}
@@ -34,7 +34,7 @@
         {% include './_form_field.html' with field=form.service_number %}
       </div>
 
-      {% include './_form_button.html' with button='<button id="btn_add-tickennote">Add Note</button>' label='Notes' %}
+      {% include './_form_button.html' with button='<button id="btn_add-ticketnote">Add Note To Ticket</button>' label='Notes' %}
 
       <div id="div_insert-ticketnote"></div>
       {{ ticketnotes.management_form }}
@@ -92,7 +92,7 @@
           </div>
         {% endfor %}
       </div>
-      {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit Form</button>' %}
+      {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit</button>' %}
 
     </div>
   </form>
@@ -100,7 +100,7 @@
 {% block bottomscript %}
   {{ block.super }}
   <script>
-    addFormsetListener('btn_add-ticketnote', "id_tickenote_set-", 'div_ticketnote-empty', 'div_insert-ticketnote' )
+    addFormsetListener('btn_add-ticketnote', "id_ticketnote_set-", 'div_ticketnote-empty', 'div_insert-ticketnote' )
   </script>
   <script>
     function setLocation() {
@@ -116,6 +116,32 @@
     })
 
   </script>
-
+  <script>
+    function displayItemButton() {
+      if("{{ perms.libtekticket.change_ticket }}"=="True") {
+        var href0="{% url 'libtekin:item-update' 0  %}"
+        var itemSelect = document.getElementById("{{ form.item.id_for_label }}")
+        if( itemSelect.value > 0 ) {
+          var href = href0.replace("0", itemSelect.value)
+          var aItem = document.createElement('a')
+          aItem.id="a_itemEdit"
+          aItem.href=href
+          aItem.innerText="Edit Item"
+          aItem.target="_blank"
+          itemSelect.parentNode.insertBefore(aItem, itemSelect.nextSibling )
+          aItem.addEventListner('click', function(e) {
+            e.preventDefault
+            window.open(href)
+          })
+        } else {
+          document.getElementById('a_itemEdit').remove()
+        }
+      }
+    }
+    document.getElementById("{{ form.item.id_for_label }}").addEventListener("change", function(){
+      displayItemButton()
+    });
+    displayItemButton()
+  </script>
 {% endblock %}
 

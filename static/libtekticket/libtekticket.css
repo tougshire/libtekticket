@@ -33,6 +33,10 @@
     width:15%;
 }
 
+.form .field {
+    width:80%;
+}
+
 .form .help_text {
     margin-left:15%;
 }

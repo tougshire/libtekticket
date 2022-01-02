@@ -74,11 +74,33 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
             for form in ticketnotes.forms:
                 print( form.errors )
 
+        ticket_url = reverse('libtekticket:ticket-detail', kwargs={'pk':self.object.pk})
+        mail_message = "\r".join(
+            [
+                f"Urgency: { self.object.get_urgency_display() }",
+                f"Item: { self.object.item }",
+                f"Description: { self.object.long_description }",
+                f"Ticket URL: { ticket_url }"
+            ]
+        )
+        mail_html_message = "<br>".join(
+            [
+                f"Urgency: { self.object.get_urgency_display() }",
+                f"Item: { self.object.item }",
+                f"Description: { self.object.long_description }",
+                f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
+            ]
+        )
+        mail_recipients = [
+            tech.user.email for tech in Technician.objects.filter(user__isnull=False)
+        ]  + ( [ self.object.submitted_by.email ] if self.object.submitted_by.email is not None else [] ) ,
+
         send_mail(
-            'Tech Ticket: ' + form.cleaned_data['short_description'],
-            f"Urgency: { self.object.get_urgency_display() }\mItem: { self.object.item }\m{ self.object.description }",
-            self.request.user.email,
-            [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]  + ( [ self.object.submitted_by.email ] if self.object.submitted_by.email is not None else [] ) ,
+            'Tech Ticket: ' + self.object.short_description,
+            mail_message,
+            'suvapuli@tougshrire.com',
+            mail_recipients,
+            html_message=mail_html_message,
             fail_silently=False,
         )
 
@@ -349,11 +371,43 @@ class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView)
 
         response = super().form_valid(form)
 
+        ticket_url = reverse('libtekticket:ticket-detail', kwargs={'pk':self.object.ticket.pk})
+        mail_message = "\r".join(
+            [
+                f"Update to { self.object.ticket }: {self.object.text }"
+                f"Item: { self.object.ticket.item }",
+                f"Ticket Urgency: {self.object.ticket.get_urgency_display}",
+                f"Description: { self.object.ticket.long_description }",
+                f"Ticket URL: { ticket_url }"
+            ]
+        )
+        mail_html_message = "<br>".join(
+            [
+                f"Update to { self.object.ticket }: {self.object.text }"
+                f"Item: { self.object.ticket.item }",
+                f"Ticket Urgency: {self.object.ticket.get_urgency_display}",
+                f"Ticket Description: { self.object.ticket.long_description }",
+                f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
+            ]
+        )
+        print ('tp m12f57 self.object.submitted_by')
+        if self.object.submitted_by is not None:
+            print (self.object.submitted_by)
+        else:
+            print('is none')
+        print ('tp m12f58 self.object.submitted_by')
+        print('x' if self.object.submitted_by is not None and self.object.submitted_by.email > '' else 'y')
+
+        mail_recipients = [
+            tech.user.email for tech in Technician.objects.filter(user__isnull=False).filter(user__email__gt='')
+        ] + ( [ self.object.submitted_by.email ] if self.object.submitted_by is not None and self.object.submitted_by.email > '' else [] )
+
         send_mail(
-            'Tech Ticket Update: ' + ticket.short_description,
-            f"{ self.object.text }",
-            self.request.user.email,
-            [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]  + ( [ self.object.submitted_by.email ] if self.object.submitted_by.email is not None else [] ) ,
+            'Note added to Tech Ticket: ' + self.object.ticket.short_description,
+            mail_message,
+            'suvapuli@tougshrire.com',
+            mail_recipients,
+            html_message=mail_html_message,
             fail_silently=False,
         )
 

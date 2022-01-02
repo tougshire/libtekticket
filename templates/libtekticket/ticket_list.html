@@ -160,6 +160,9 @@
         {% if 'submitted_by' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=ticket_labels.submitted_by %}
         {% endif %}
+        {% if 'when' in show_columns or not show_columns %}
+          {% include './_list_head.html' with field=ticket_labels.when %}
+        {% endif %}
       </div>
 
       {% for item in object_list %}
@@ -180,6 +183,11 @@
           {% if 'submitted_by' in show_columns or not show_columns %}
             {% include './_list_field.html' with field=item.submitted_by %}
           {% endif %}
+          {% with when_formatted=item.when|date:'Y-m-d'  %}
+            {% if 'when' in show_columns or not show_columns %}
+              {% include './_list_field.html' with field=when_formatted %}
+            {% endif %}
+          {% endwith %}
         </div>
       {% endfor %}
 
