@@ -70,8 +70,14 @@ def send_ticket_mail( ticket, request, is_new=False ):
     )
     mail_recipients = [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]
 
+    print('tp m15f46 mail recipients')
+    print(mail_recipients)
+
     if  ticket.submitted_by.email is not None:
         mail_recipients.append( ticket.submitted_by.email )
+
+    print('tp m15f47 mail recipients')
+    print(mail_recipients)
 
     send_mail(
         mail_subject,
