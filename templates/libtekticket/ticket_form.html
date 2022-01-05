@@ -79,7 +79,7 @@
           aItem.innerText="Edit Item"
           aItem.target="_blank"
           itemSelect.parentNode.insertBefore(aItem, itemSelect.nextSibling )
-          aItem.addEventListner('click', function(e) {
+          aItem.addEventListener('click', function(e) {
             e.preventDefault
             window.open(href)
           })
