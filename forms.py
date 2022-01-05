@@ -23,7 +23,7 @@ class TicketForm(forms.ModelForm):
         ]
         widgets = {
             'item':ItemSelect,
-            'short_description':forms.TextInput(attrs={'style':'width:60%'})
+            'short_description':forms.TextInput(attrs={'style':'size:80'})
         }
 
 
