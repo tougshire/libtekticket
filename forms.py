@@ -26,7 +26,7 @@ class TicketForm(forms.ModelForm):
         }
 
 
-class TicketNoteForm(forms.ModelForm):
+class TicketTicketNoteForm(forms.ModelForm):
     class Meta:
         model = TicketNote
         fields = [
@@ -38,4 +38,4 @@ class TicketNoteForm(forms.ModelForm):
             'text':forms.TextInput(attrs={'style':'width:100%'})
         }
 
-TicketTicketNoteFormSet = forms.inlineformset_factory(Ticket, TicketNote, TicketNoteForm, extra=0)
+#TicketTicketNoteFormSet = forms.inlineformset_factory(Ticket, TicketNote, TicketNoteForm, extra=0)

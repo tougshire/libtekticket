@@ -1,3 +1,4 @@
+{% load perm_checks %}
   <h2>{{ object }}</h2>
 
   <div class="detail">
@@ -8,6 +9,12 @@
     {% include './_detail_field.html' with label=ticket_labels.submitted_by field=object.submitted_by %}
 
     <h3>Notes</h3>
+    {% user_is_editor object user as editor %}
+    {% if editor %}
+      {% if perms.libtekticket.add_ticket %}
+        <div><a id="a_addnote" href="{% url 'libtekticket:ticket-ticketnote-create' object.pk %}">Add Note</a></div>
+      {% endif %}
+    {% endif %}
     {% for ticketnote in object.ticketnote_set.all %}
       <div class="relatedset relatedticketnote" id="div_ticketnote-{{ forloop.counter0 }}">
         <div class="fieldWrapper">
@@ -16,14 +23,46 @@
               Note:
             </div>
             <div class="field">
-              {{ ticketnote.subject }}: {{ ticketnote.text }}
+              {{ ticketnote.when }}: {{ ticketnote.text }}
             </div>
           </div>
         </div>
       </div>
     {% endfor %}
-
-
-
+    <div class="relatedset relatedticketnote" id="div_ticketnote-empty" style="display:none">
+      <div class="fieldWrapper">
+        <div class="control">
+          <div class="label">
+            Note:
+          </div>
+          <div class="field">
+            <span data-field="when"></span> : <span data-field="text"></span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script>
+    document.getElementById('a_addnote').addEventListener('click', function(e) {
+      e.preventDefault()
+      window.open(e.target.href)
+    });
+    function refreshDiv(fields, model) {
+      var emptydiv = document.getElementById('div_' + model + '-empty')
+      var newdiv = emptydiv.cloneNode(true)
+      var allTicketnoteDivs = document.getElementsByClassName('relatedticketnote')
+      newdiv.id = 'div_' + model + '-' + allTicketnoteDivs.length
+      keys = Object.keys(fields)
+      console.log('keys:')
+      console.log(keys)
+      for(key of keys){
+        console.log("span[data-field='" + key + "']")
+        console.log(fields[key])
+        newdiv.querySelector("span[data-field='" + key + "']").innerText=fields[key]
+      }
+      newdiv.style.display="block"
+      emptydiv.parentNode.insertBefore(newdiv, emptydiv)
+    }
+  </script>
 

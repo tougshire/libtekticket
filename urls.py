@@ -9,5 +9,6 @@ urlpatterns = [
     path('ticket/<int:pk>/detail/', views.TicketDetail.as_view(), name='ticket-detail'),
     path('ticket/<int:pk>/delete/', views.TicketSoftDelete.as_view(), name='ticket-delete'),
     path('ticket/list/', views.TicketList.as_view(), name='ticket-list'),
-    path('ticketnote/<int:ticket>/create/', views.TicketNoteCreate.as_view(), name='ticketnote-create'),
+    path('ticket/<int:ticketpk>/ticketnote/create/', views.TicketTicketNoteCreate.as_view(), name='ticket-ticketnote-create'),
+    path('ticket/ticketnote/<int:pk>/close/', views.TicketTicketNoteClose.as_view(), name='ticket-ticketnote-close'),
 ]

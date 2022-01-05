@@ -13,7 +13,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from tougshire_vistas.models import Vista
 from django.contrib.auth import get_user_model
-from .forms import TicketForm, TicketNoteForm, TicketTicketNoteFormSet
+from .forms import TicketForm, TicketTicketNoteForm
 from .models import Technician, History, Ticket, TicketNote
 
 from libtekin.models import Item, Mmodel
@@ -36,6 +36,51 @@ def update_history(form, modelname, object, user):
 
         history.save()
 
+def send_ticket_mail( ticket, request, is_new=False ):
+    """Send an email
+
+    Args:
+        ticket: The ticket about which the email is being sent.  Usually self.object or self.object.ticket
+        request: A request object.  Usually self.request
+        is_new: If this mail is about the creation of a new ticket.  If not then it's an update
+
+    """
+    ticket_url = request.build_absolute_uri( reverse('libtekticket:ticket-detail', kwargs={'pk':ticket.pk}) )
+
+    mail_subject_action = "Submitted" if is_new else "Updated"
+    mail_subject = f"Ticke Ticket { mail_subject_action }: { ticket.short_description }"
+
+    mail_from = settings.LIBTEKTICKET_EMAIL_FROM if hasattr(settings, 'LIBTEKTICKET_FROM_EMAIL') else settings.DEFAULT_FROM_EMAIL
+
+    mail_message = "\r".join(
+        [
+            f"Urgency: { ticket.get_urgency_display() }",
+            f"Item: { ticket.item }",
+            f"Description: { ticket.long_description }",
+            f"Ticket URL: { ticket_url }"
+        ]
+    )
+    mail_html_message = "<br>".join(
+        [
+            f"Urgency: { ticket.get_urgency_display() }",
+            f"Item: { ticket.item }",
+            f"Description: { ticket.long_description }",
+            f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
+        ]
+    )
+    mail_recipients = [
+        tech.user.email for tech in Technician.objects.filter(user__isnull=False)
+    ]  + ( [ ticket.submitted_by.email ] if ticket.submitted_by.email is not None else [] ) ,
+
+    send_mail(
+        mail_subject,
+        mail_message,
+        mail_from,
+        mail_recipients,
+        html_message=mail_html_message,
+        fail_silently=False,
+    )
+
 class TicketCreate(PermissionRequiredMixin, CreateView):
     permission_required = 'libtekticket.add_ticket'
     model = Ticket
@@ -44,11 +89,6 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
 
         context_data = super().get_context_data(**kwargs)
-
-        if self.request.POST:
-            context_data['ticketnotes'] = TicketTicketNoteFormSet(self.request.POST)
-        else:
-            context_data['ticketnotes'] = TicketTicketNoteFormSet()
 
         return context_data
 
@@ -61,48 +101,7 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
 
         self.object = form.save()
 
-        ticketnotes = TicketTicketNoteFormSet(self.request.POST, instance=self.object)
-
-        if ticketnotes.is_valid():
-            for form in ticketnotes.forms:
-                update_history(form, 'ticketnote', form.instance, self.request.user)
-
-            ticketnotes.save()
-        else:
-            print("formset is not not valid")
-            print(ticketnotes.errors)
-            for form in ticketnotes.forms:
-                print( form.errors )
-
-        ticket_url = reverse('libtekticket:ticket-detail', kwargs={'pk':self.object.pk})
-        mail_message = "\r".join(
-            [
-                f"Urgency: { self.object.get_urgency_display() }",
-                f"Item: { self.object.item }",
-                f"Description: { self.object.long_description }",
-                f"Ticket URL: { ticket_url }"
-            ]
-        )
-        mail_html_message = "<br>".join(
-            [
-                f"Urgency: { self.object.get_urgency_display() }",
-                f"Item: { self.object.item }",
-                f"Description: { self.object.long_description }",
-                f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
-            ]
-        )
-        mail_recipients = [
-            tech.user.email for tech in Technician.objects.filter(user__isnull=False)
-        ]  + ( [ self.object.submitted_by.email ] if self.object.submitted_by.email is not None else [] ) ,
-
-        send_mail(
-            'Tech Ticket: ' + self.object.short_description,
-            mail_message,
-            'suvapuli@tougshrire.com',
-            mail_recipients,
-            html_message=mail_html_message,
-            fail_silently=False,
-        )
+        send_ticket_mail( self.object, self.request, is_new=True )
 
         return response
 
@@ -118,14 +117,8 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
     model = Ticket
     form_class = TicketForm
 
-
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context_data['ticketnotes'] = TicketTicketNoteFormSet(self.request.POST, instance=self.object)
-        else:
-            context_data['ticketnotes'] = TicketTicketNoteFormSet(instance=self.object)
-
         return context_data
 
     def form_valid(self, form):
@@ -134,24 +127,10 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
 
         response = super().form_valid(form)
 
-        ticketnotes = TicketTicketNoteFormSet(self.request.POST, instance=self.object)
-
-        if ticketnotes.is_valid():
-
-            for form in ticketnotes.forms:
-                update_history(form, 'Item', form.instance, self.request.user)
-
-            ticketnotes.save()
-        else:
-            print("formset is not not valid")
-            print(ticketnotes.errors)
-            for form in ticketnotes.forms:
-                print( form.errors )
-
         return response
 
     def get_success_url(self):
-        return reverse_lazy('libtekticket:tiket-detail', kwargs={ 'pk':self.object.pk })
+        return reverse_lazy('libtekticket:ticket-detail', kwargs={ 'pk':self.object.pk })
 
 
 class TicketDetail(PermissionRequiredMixin, DetailView):
@@ -163,8 +142,6 @@ class TicketDetail(PermissionRequiredMixin, DetailView):
         context_data = super().get_context_data(**kwargs)
         context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
         context_data['ticketnote_labels'] = { field.name: field.verbose_name.title() for field in TicketNote._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
-
-        context_data['ticketnote_form'] = TicketNoteCreate.form_class
         return context_data
 
 class TicketDelete(PermissionRequiredMixin, UpdateView):
@@ -339,14 +316,15 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         return context_data
 
-class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView):
+class TicketTicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'libtekticket.add_ticket'
     model = TicketNote
-    form_class = TicketNoteForm
+    form_class = TicketTicketNoteForm
+    template_name = 'libtekticket/ticketticketnote_form.html'
 
     def test_func(self):
         try:
-            ticket = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+            ticket = Ticket.objects.get(pk=self.kwargs.get('ticketpk'))
         except LookupError:
             return False
 
@@ -356,14 +334,14 @@ class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView)
 
         context_data = super().get_context_data(**kwargs)
 
-        context_data['ticket'] = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+        context_data['ticket'] = Ticket.objects.get(pk=self.kwargs.get('ticketpk'))
 
         return context_data
 
     def form_valid(self, form):
 
 
-        ticket = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+        ticket = Ticket.objects.get(pk=self.kwargs.get('ticketpk'))
 
         self.object = form.save(commit=False)
         self.object.ticket = ticket
@@ -371,7 +349,7 @@ class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView)
 
         response = super().form_valid(form)
 
-        ticket_url = reverse('libtekticket:ticket-detail', kwargs={'pk':self.object.ticket.pk})
+        ticket_url = self.request.build_absolute_uri( reverse('libtekticket:ticket-detail', kwargs={'pk':self.object.ticket.pk}) )
         mail_message = "\r".join(
             [
                 f"Update to { self.object.ticket }: {self.object.text }"
@@ -390,13 +368,6 @@ class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView)
                 f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
             ]
         )
-        print ('tp m12f57 self.object.submitted_by')
-        if self.object.submitted_by is not None:
-            print (self.object.submitted_by)
-        else:
-            print('is none')
-        print ('tp m12f58 self.object.submitted_by')
-        print('x' if self.object.submitted_by is not None and self.object.submitted_by.email > '' else 'y')
 
         mail_recipients = [
             tech.user.email for tech in Technician.objects.filter(user__isnull=False).filter(user__email__gt='')
@@ -415,6 +386,14 @@ class TicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView)
 
     def get_success_url(self):
 
-        ticket = Ticket.objects.get(pk=self.kwargs.get('ticket'))
+        ticket = Ticket.objects.get(pk=self.kwargs.get('ticketpk'))
 
-        return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': ticket.pk})
+        if 'opener' in self.request.POST and self.request.POST['opener'] > '':
+            return reverse_lazy('libtekticket:ticket-ticketnote-close', kwargs={'pk': self.object.pk})
+        else:
+            return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': ticket.pk})
+
+class TicketTicketNoteClose(PermissionRequiredMixin, DetailView):
+    permission_required = 'libtekticket.add_ticket'
+    model = TicketNote
+    template_name = 'libtekticket/ticketticketnote_closer.html'

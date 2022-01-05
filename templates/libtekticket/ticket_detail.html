@@ -12,11 +12,5 @@
       <a href="{% url 'libtekticket:ticket-delete' object.pk %}">Delete</a>
       </div>
     {% endif %}
-    {% if ticket.submitted_by.pk == user.pk %}
-      <a href="{% url 'libtekticket:ticketnote-create' ticket.pk %}">Add a note</a>
-    {% endif %}
-  </div>
-  <div>
-  </div  <div>
   </div>
 {% endblock %}

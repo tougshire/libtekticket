@@ -1,0 +1,9 @@
+{% extends './_base.html' %}
+{% block content %}
+<script>
+if(window.opener) {
+  window.opener.refreshDiv({'when':'{{ object.when }}', 'text':'{{ object.text }}'}, "ticketnote")
+  window.close()
+}
+</script>
+{% endblock %}

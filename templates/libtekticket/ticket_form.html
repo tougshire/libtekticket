@@ -34,64 +34,14 @@
         {% include './_form_field.html' with field=form.service_number %}
       </div>
 
-      {% include './_form_button.html' with button='<button id="btn_add-ticketnote">Add Note To Ticket</button>' label='Notes' %}
+      <h3>Notes</h3>
+      {% include './_form_button.html' with button='<button id="btn_add-ticketnote">Add Note</button>' label='Notes' %}
 
       <div id="div_insert-ticketnote"></div>
-      {{ ticketnotes.management_form }}
-      {% for form in ticketnotes.forms %}
+
+      {% for ticketnote in ticket.ticket_note_set.all %}
         <h4>Note</h4>
-        <div class="formset" id="div_ticketnote-{{ forloop.counter0 }}">
-          {{ form.errors }}
-          {% for field in form.hidden_fields %}
-            {{ field }}
-          {% endfor %}
-          {% for field in form.visible_fields%}
-            <div class="fieldWrapper">
-              {% if field.errors %}
-                <div class="errors">
-                  {{ field.errors }}
-                </div>
-              {% endif %}
-              <div class="control">
-                <div class="label">
-                  {{ field.label_tag }}
-                </div>
-                <div class="field">
-                  {{ field }}
-                </div>
-              </div>
-              <div class="help_text">
-                {{ field.help_text}}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
       {% endfor %}
-      <div style="display:none" class="emptyformset" id="div_ticketnote-empty">
-        {% for field in ticketnotes.empty_form.hidden_fields %}
-          {{ field }}
-        {% endfor %}
-        {% for field in ticketnotes.empty_form.visible_fields%}
-          <div class="fieldWrapper">
-            {% if field.errors %}
-              <div class="errors">
-                {{ field.errors }}
-              </div>
-            {% endif %}
-            <div class="control">
-              <div class="label">
-                {{ field.label_tag }}
-              </div>
-              <div class="field">
-                {{ field }}
-              </div>
-            </div>
-            <div class="help_text">
-              {{ field.help_text}}
-            </div>
-          </div>
-        {% endfor %}
-      </div>
       {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit</button>' %}
 
     </div>
@@ -142,6 +92,9 @@
       displayItemButton()
     });
     displayItemButton()
+  </script>
+  <script>
+    addFilterInput("{{ form.item.id_for_label }}")
   </script>
 {% endblock %}
 

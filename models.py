@@ -26,7 +26,7 @@ class Technician(models.Model):
 
     @classmethod
     def user_is_tech(cls, user):
-        return user.pk in [ technician.user for technician in Technician.objects.all() ]
+        return user in [ technician.user for technician in Technician.objects.all() ]
 
 class Ticket(models.Model):
     item = models.ForeignKey(
@@ -93,7 +93,7 @@ class Ticket(models.Model):
         return self.short_description
 
     def user_is_editor(self, user):
-        return user == self.submitted_by or Technician.user_is_tech(user)
+        return user == self.submitted_by or user.has_perm('libtekticket.change_ticket')
 
     class Meta:
         ordering=['-when']
@@ -123,6 +123,9 @@ class TicketNote(models.Model):
         default=date.today,
         help_text='The effective date of the note (when it applies as opposed to when it was actually made)'
     )
+
+    def __str__(self):
+        return self.text
 
 class History(models.Model):
 

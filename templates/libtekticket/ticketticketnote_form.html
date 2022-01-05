@@ -1,30 +1,31 @@
 {% extends './_form.html' %}
 {% load static %}
 {% block content %}
-  <h2>{{ ticket }}</h2>
-  {% with object=ticket %}
-    {% include './ticket_detail_include.html' %}
-  {% endwith %}
+  <h2>Note for Ticket: {{ ticket }}</h2>
   {{ form.errors }}
   <form method="POST">
     <div class="form">
       {% csrf_token %}
+      <input type="hidden" id="input_opener" name="opener">
       {% for field in form.hidden_fields %}
         {{ field }}
       {% endfor %}
-
       <div id="div_item">
         {% include './_form_field.html' with field=form.text %}
       </div>
       <div id="div_location">
         {% include './_form_field.html' with field=form.when %}
       </div>
-
       <button type="submit">Submit</button>
     </div>
   </form>
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
+  <script>
+    if(window.opener) {
+      document.getElementById('input_opener').value = window.opener.location.href
+    }
+  </script>
 {% endblock %}
 
