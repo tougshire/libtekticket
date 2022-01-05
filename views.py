@@ -68,9 +68,10 @@ def send_ticket_mail( ticket, request, is_new=False ):
             f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
         ]
     )
-    mail_recipients = [
-        tech.user.email for tech in Technician.objects.filter(user__isnull=False)
-    ]  + ( [ ticket.submitted_by.email ] if ticket.submitted_by.email is not None else [] ) ,
+    mail_recipients = [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]
+
+    if  ticket.submitted_by.email is not None:
+        mail_recipients.append( ticket.submitted_by.email )
 
     send_mail(
         mail_subject,
