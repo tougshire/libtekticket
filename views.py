@@ -65,7 +65,7 @@ def send_ticket_mail( ticket, request, is_new=False ):
             f"Urgency: { ticket.get_urgency_display() }",
             f"Item: { ticket.item }",
             f"Description: { ticket.long_description }",
-            f"Ticket URL: <a href=\"{ ticket_url }\">ticket_url</a>"
+            f"Ticket URL: <a href=\"{ ticket_url }\">{{ ticket_url  }}</a>"
         ]
     )
     mail_recipients = [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]

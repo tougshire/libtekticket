@@ -1,5 +1,6 @@
 {% extends './_form.html' %}
 {% load static %}
+{% load perm_checks %}
 {% block content %}
   <h2>{{ object }}</h2>
   {{ form.errors }}
@@ -34,18 +35,45 @@
         {% include './_form_field.html' with field=form.service_number %}
       </div>
 
-      <h3>Notes</h3>
-      {% include './_form_button.html' with button='<button id="btn_add-ticketnote">Add Note</button>' label='Notes' %}
-
-      <div id="div_insert-ticketnote"></div>
-
-      {% for ticketnote in ticket.ticket_note_set.all %}
-        <h4>Note</h4>
-      {% endfor %}
       {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit</button>' %}
+      <h3>Notes</h3>
+
+      {% user_is_editor object user as editor %}
+      {% if editor %}
+        {% if perms.libtekticket.add_ticket %}
+          <div><a id="a_addnote" href="{% url 'libtekticket:ticket-ticketnote-create' object.pk %}">Add Note</a></div>
+        {% endif %}
+      {% endif %}
+
 
     </div>
   </form>
+  {% for ticketnote in object.ticketnote_set.all %}
+    <div class="relatedset relatedticketnote" id="div_ticketnote-{{ forloop.counter0 }}">
+      <div class="fieldWrapper">
+        <div class="control">
+          <div class="label">
+            Note:
+          </div>
+          <div class="field">
+            {{ ticketnote.when }}: {{ ticketnote.text }}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  <div class="relatedset relatedticketnote" id="div_ticketnote-empty" style="display:none">
+    <div class="fieldWrapper">
+      <div class="control">
+        <div class="label">
+          Note:
+        </div>
+        <div class="field">
+          <span data-field="when"></span> : <span data-field="text"></span>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
@@ -62,6 +90,7 @@
       }
     }
     document.getElementById('{{ form.item.id_for_label }}').addEventListener('change', function() {
+      console.log('change event triggered')
       setLocation();
     })
 
@@ -84,7 +113,10 @@
             window.open(href)
           })
         } else {
-          document.getElementById('a_itemEdit').remove()
+          var aItem = document.getElementById('a_itemEdit')
+          if(typeof(aItem) != 'undefined' && aItem != null
+            document.getElementById('a_itemEdit').remove()
+          }
         }
       }
     }
@@ -96,5 +128,28 @@
   <script>
     addFilterInput("{{ form.item.id_for_label }}")
   </script>
+  <script>
+    document.getElementById('a_addnote').addEventListener('click', function(e) {
+      e.preventDefault()
+      window.open(e.target.href)
+    });
+    function refreshDiv(fields, model) {
+      var emptydiv = document.getElementById('div_' + model + '-empty')
+      var newdiv = emptydiv.cloneNode(true)
+      var allTicketnoteDivs = document.getElementsByClassName('relatedticketnote')
+      newdiv.id = 'div_' + model + '-' + allTicketnoteDivs.length
+      keys = Object.keys(fields)
+      console.log('keys:')
+      console.log(keys)
+      for(key of keys){
+        console.log("span[data-field='" + key + "']")
+        console.log(fields[key])
+        newdiv.querySelector("span[data-field='" + key + "']").innerText=fields[key]
+      }
+      newdiv.style.display="block"
+      emptydiv.parentNode.insertBefore(newdiv, emptydiv)
+    }
+  </script>
+
 {% endblock %}
 
