@@ -38,10 +38,12 @@
       {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit</button>' %}
       <h3>Notes</h3>
 
-      {% user_is_editor object user as editor %}
-      {% if editor %}
-        {% if perms.libtekticket.add_ticket %}
-          <div><a id="a_addnote" href="{% url 'libtekticket:ticket-ticketnote-create' object.pk %}">Add Note</a></div>
+      {% if object.pk %}
+        {% user_is_editor object user as editor %}
+        {% if editor %}
+          {% if perms.libtekticket.add_ticket %}
+            <div><a id="a_addnote" href="{% url 'libtekticket:ticket-ticketnote-create' object.pk %}">Add Note</a></div>
+          {% endif %}
         {% endif %}
       {% endif %}
 
