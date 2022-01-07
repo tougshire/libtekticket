@@ -11,6 +11,11 @@ class ItemSelect(forms.Select):
 
 
 class TicketForm(forms.ModelForm):
+    def __init__(self, **kwargs):
+        print('tp m16830')
+        print(getattr(self._meta, 'fields'))
+        return super().__init__(**kwargs)
+
     class Meta:
         model = Ticket
         fields = [
@@ -23,7 +28,8 @@ class TicketForm(forms.ModelForm):
         ]
         widgets = {
             'item':ItemSelect,
-            'short_description':forms.TextInput(attrs={'style':'size:80'})
+            'short_description':forms.TextInput(attrs={'class':'len75'}),
+            'long_description':forms.Textarea(attrs={'class':'len75'}),
         }
 
 
@@ -36,7 +42,7 @@ class TicketTicketNoteForm(forms.ModelForm):
         ]
         widgets={
             'when':forms.DateInput(attrs={'type':'date'}),
-            'text':forms.TextInput(attrs={'style':'width:100%'})
+            'text':forms.TextInput(attrs={'class':'len100'})
         }
 
 #TicketTicketNoteFormSet = forms.inlineformset_factory(Ticket, TicketNote, TicketNoteForm, extra=0)

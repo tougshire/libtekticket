@@ -36,6 +36,16 @@
 .form .field {
     width:80%;
 }
+input.len100, textarea.len100 {
+    width:100%;
+}
+
+input.len75, textarea.len75 {
+    width:75%;
+}
+input.len50, textarea.len50 {
+    width:50%;
+}
 
 .form .help_text {
     margin-left:15%;

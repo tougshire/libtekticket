@@ -47,7 +47,6 @@
         {% endif %}
       {% endif %}
 
-
     </div>
   </form>
   {% for ticketnote in object.ticketnote_set.all %}
@@ -80,9 +79,6 @@
 {% block bottomscript %}
   {{ block.super }}
   <script>
-    addFormsetListener('btn_add-ticketnote', "id_ticketnote_set-", 'div_ticketnote-empty', 'div_insert-ticketnote' )
-  </script>
-  <script>
     function setLocation() {
       var itemField = document.getElementById('{{ form.item.id_for_label }}')
       var locationField = document.getElementById('{{ form.location.id_for_label }}')
@@ -98,43 +94,48 @@
 
   </script>
   <script>
-    function displayItemButton() {
+    function displayEditItemLink() {
       if("{{ perms.libtekticket.change_ticket }}"=="True") {
         var href0="{% url 'libtekin:item-update' 0  %}"
         var itemSelect = document.getElementById("{{ form.item.id_for_label }}")
+        var aItem = document.getElementById('a_itemEdit')
+        if(typeof(aItem) != 'undefined' && aItem != null){
+          document.getElementById('a_itemEdit').remove()
+        }
         if( itemSelect.value > 0 ) {
           var href = href0.replace("0", itemSelect.value)
           var aItem = document.createElement('a')
           aItem.id="a_itemEdit"
-          aItem.href=href
           aItem.innerText="Edit Item"
           aItem.target="_blank"
           itemSelect.parentNode.insertBefore(aItem, itemSelect.nextSibling )
+          aItem.href=href
           aItem.addEventListener('click', function(e) {
             e.preventDefault
             window.open(href)
           })
-        } else {
-          var aItem = document.getElementById('a_itemEdit')
-          if(typeof(aItem) != 'undefined' && aItem != null
-            document.getElementById('a_itemEdit').remove()
-          }
         }
       }
     }
     document.getElementById("{{ form.item.id_for_label }}").addEventListener("change", function(){
-      displayItemButton()
+      displayEditItemLink()
     });
-    displayItemButton()
+    displayEditItemLink()
   </script>
   <script>
     addFilterInput("{{ form.item.id_for_label }}")
   </script>
   <script>
-    document.getElementById('a_addnote').addEventListener('click', function(e) {
-      e.preventDefault()
-      window.open(e.target.href)
-    });
+    function addAddNotePopupEvent() {
+      aAddNote = document.getElementById('a_addnote')
+      if(typeof(aAddNote) != 'undefined' && aAddNote != null){
+        document.getElementById('a_addnote').addEventListener('click', function(e) {
+          e.preventDefault()
+          window.open(e.target.href)
+        });
+      }
+    }
+    addAddNotePopupEvent()
     function refreshDiv(fields, model) {
       var emptydiv = document.getElementById('div_' + model + '-empty')
       var newdiv = emptydiv.cloneNode(true)
