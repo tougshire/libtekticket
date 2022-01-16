@@ -18,12 +18,13 @@ from .models import Technician, History, Ticket, TicketNote
 
 from libtekin.models import Item, Mmodel
 
+
 def update_history(form, modelname, object, user):
     for fieldname in form.changed_data:
         try:
-            old_value=str(form.initial[fieldname]),
+            old_value = str(form.initial[fieldname]),
         except KeyError:
-            old_value=None
+            old_value = None
 
         history = History.objects.create(
             user=user,
@@ -36,7 +37,8 @@ def update_history(form, modelname, object, user):
 
         history.save()
 
-def send_ticket_mail( ticket, request, is_new=False ):
+
+def send_ticket_mail(ticket, request, is_new=False):
     """Send an email
 
     Args:
@@ -45,12 +47,14 @@ def send_ticket_mail( ticket, request, is_new=False ):
         is_new: If this mail is about the creation of a new ticket.  If not then it's an update
 
     """
-    ticket_url = request.build_absolute_uri( reverse('libtekticket:ticket-detail', kwargs={'pk':ticket.pk}) )
+    ticket_url = request.build_absolute_uri(
+        reverse('libtekticket:ticket-detail', kwargs={'pk': ticket.pk}))
 
     mail_subject_action = "Submitted" if is_new else "Updated"
-    mail_subject = f"Ticke Ticket { mail_subject_action }: { ticket.short_description }"
+    mail_subject = f"Tech Ticket { mail_subject_action }: { ticket.short_description }"
 
-    mail_from = settings.LIBTEKTICKET_EMAIL_FROM if hasattr(settings, 'LIBTEKTICKET_FROM_EMAIL') else settings.DEFAULT_FROM_EMAIL
+    mail_from = settings.LIBTEKTICKET_EMAIL_FROM if hasattr(
+        settings, 'LIBTEKTICKET_FROM_EMAIL') else settings.DEFAULT_FROM_EMAIL
 
     mail_message = "\r".join(
         [
@@ -65,16 +69,17 @@ def send_ticket_mail( ticket, request, is_new=False ):
             f"Urgency: { ticket.get_urgency_display() }",
             f"Item: { ticket.item }",
             f"Description: { ticket.long_description }",
-            f"Ticket URL: <a href=\"{ ticket_url }\">{{ ticket_url  }}</a>"
+            f"Ticket URL: <a href=\"{ ticket_url }\">{ ticket_url }</a>"
         ]
     )
-    mail_recipients = [ tech.user.email for tech in Technician.objects.filter(user__isnull=False) ]
+    mail_recipients = [
+        tech.user.email for tech in Technician.objects.filter(user__isnull=False)]
 
     print('tp m15f46 mail recipients')
     print(mail_recipients)
 
-    if  ticket.submitted_by.email is not None:
-        mail_recipients.append( ticket.submitted_by.email )
+    if ticket.submitted_by.email is not None:
+        mail_recipients.append(ticket.submitted_by.email)
 
     print('tp m15f47 mail recipients')
     print(mail_recipients)
@@ -87,6 +92,7 @@ def send_ticket_mail( ticket, request, is_new=False ):
         html_message=mail_html_message,
         fail_silently=False,
     )
+
 
 class TicketCreate(PermissionRequiredMixin, CreateView):
     permission_required = 'libtekticket.add_ticket'
@@ -108,7 +114,7 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
 
         self.object = form.save()
 
-        send_ticket_mail( self.object, self.request, is_new=True )
+        send_ticket_mail(self.object, self.request, is_new=True)
 
         return response
 
@@ -118,6 +124,7 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
             return reverse_lazy('libtekticket:ticket-close', kwargs={'pk': self.object.pk})
         else:
             return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': self.object.pk})
+
 
 class TicketUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'libtekticket.change_ticket'
@@ -137,7 +144,7 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
         return response
 
     def get_success_url(self):
-        return reverse_lazy('libtekticket:ticket-detail', kwargs={ 'pk':self.object.pk })
+        return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': self.object.pk})
 
 
 class TicketDetail(PermissionRequiredMixin, DetailView):
@@ -147,14 +154,18 @@ class TicketDetail(PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
 
         context_data = super().get_context_data(**kwargs)
-        context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
-        context_data['ticketnote_labels'] = { field.name: field.verbose_name.title() for field in TicketNote._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
+        context_data['ticket_labels'] = {field.name: field.verbose_name.title(
+        ) for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel'}
+        context_data['ticketnote_labels'] = {field.name: field.verbose_name.title(
+        ) for field in TicketNote._meta.get_fields() if type(field).__name__[-3:] != 'Rel'}
         return context_data
+
 
 class TicketDelete(PermissionRequiredMixin, UpdateView):
     permission_required = 'libtekticket.delete_ticket'
     model = Ticket
     success_url = reverse_lazy('libtekticket:ticket-list')
+
 
 class TicketSoftDelete(PermissionRequiredMixin, UpdateView):
     permission_required = 'libtekticket.delete_ticket'
@@ -166,11 +177,15 @@ class TicketSoftDelete(PermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
 
         context_data = super().get_context_data(**kwargs)
-        context_data['current_notes'] = self.object.ticketnote_set.all().filter(is_current_status=True)
-        context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
-        context_data['ticketnote_labels'] = { field.name: field.verbose_name.title() for field in TicketNote._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
+        context_data['current_notes'] = self.object.ticketnote_set.all().filter(
+            is_current_status=True)
+        context_data['ticket_labels'] = {field.name: field.verbose_name.title(
+        ) for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel'}
+        context_data['ticketnote_labels'] = {field.name: field.verbose_name.title(
+        ) for field in TicketNote._meta.get_fields() if type(field).__name__[-3:] != 'Rel'}
 
         return context_data
+
 
 class TicketList(PermissionRequiredMixin, ListView):
     permission_required = 'libtekticket.view_ticket'
@@ -178,13 +193,15 @@ class TicketList(PermissionRequiredMixin, ListView):
     filter_object = {}
     exclude_object = {}
     order_by = []
-    order_by_fields=[]
+    order_by_fields = []
     for fieldname in ['item', 'urgency']:
         order_by_fields.append(
-            { 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title() }
+            {'name': fieldname, 'label': Ticket._meta.get_field(
+                fieldname).verbose_name.title()}
         )
         order_by_fields.append(
-            { 'name':'-' + fieldname, 'label':'{} reverse'.format(Ticket._meta.get_field(fieldname).verbose_name.title()) }
+            {'name': '-' + fieldname, 'label': '{} reverse'.format(
+                Ticket._meta.get_field(fieldname).verbose_name.title())}
         )
 
     def post(self, request, *args, **kwargs):
@@ -193,11 +210,11 @@ class TicketList(PermissionRequiredMixin, ListView):
     def get_queryset(self):
 
         order_by = []
-        filter_object={}
+        filter_object = {}
 
         if 'query_submitted' in self.request.POST:
 
-            for i in range(0,3):
+            for i in range(0, 3):
                 order_by_i = 'order_by_{}'.format(i)
                 if order_by_i in self.request.POST:
                     for field in self.order_by_fields:
@@ -219,7 +236,6 @@ class TicketList(PermissionRequiredMixin, ListView):
                 if filterfieldnone in self.request.POST:
                     filter_object[fieldname] = None
 
-
             vista__name = ''
             if 'vista__name' in self.request.POST and self.request.POST.get('vista__name') > '':
                 vista__name = self.request.POST.get('vista__name')
@@ -228,11 +244,12 @@ class TicketList(PermissionRequiredMixin, ListView):
 
                 queryset = super().get_queryset()
 
-                vista, created = Vista.objects.get_or_create( user=self.request.user, model_name='libtekticket.ticket', name=vista__name )
+                vista, created = Vista.objects.get_or_create(
+                    user=self.request.user, model_name='libtekticket.ticket', name=vista__name)
 
                 if filter_object:
                     self.filter_object = filter_object
-                    vista.filterstring = json.dumps( filter_object )
+                    vista.filterstring = json.dumps(filter_object)
                     queryset = queryset.filter(**filter_object)
 
                 if order_by:
@@ -251,7 +268,8 @@ class TicketList(PermissionRequiredMixin, ListView):
             if 'vista__name' in self.request.POST and self.request.POST.get('vista__name') > '':
                 vista__name = self.request.POST.get('vista__name')
 
-            vista, created = Vista.objects.get_or_create( user=self.request.user, model_name='libtekticket.ticket', name=vista__name )
+            vista, created = Vista.objects.get_or_create(
+                user=self.request.user, model_name='libtekticket.ticket', name=vista__name)
 
             try:
                 filter_object = json.loads(vista.filterstring)
@@ -271,15 +289,17 @@ class TicketList(PermissionRequiredMixin, ListView):
             if 'vista__name' in self.request.POST and self.request.POST.get('vista__name') > '':
 
                 vista__name = self.request.POST.get('vista__name')
-                Vista.objects.filter( user=self.request.user, model_name='libtekticket.ticket', name=vista__name ).delete()
-
+                Vista.objects.filter(
+                    user=self.request.user, model_name='libtekticket.ticket', name=vista__name).delete()
 
         # this code runs if no queryset has been returned yet
-            vista = Vista.objects.filter( user=self.request.user, is_default=True ).last()
+            vista = Vista.objects.filter(
+                user=self.request.user, is_default=True).last()
             if vista is None:
-                vista = Vista.objects.filter( user=self.request.user ).last()
+                vista = Vista.objects.filter(user=self.request.user).last()
             if vista is None:
-                vista, created = Vista.objects.get_or_create( user=self.request.user )
+                vista, created = Vista.objects.get_or_create(
+                    user=self.request.user)
 
             try:
                 filter_object = json.loads(vista.filterstring)
@@ -305,10 +325,11 @@ class TicketList(PermissionRequiredMixin, ListView):
         context_data['items'] = Item.objects.all()
         context_data['mmodels'] = Mmodel.objects.all()
         context_data['users'] = get_user_model().objects.all()
-        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekticket.ticket').all()
+        context_data['vistas'] = Vista.objects.filter(
+            user=self.request.user, model_name='libtekticket.ticket').all()
         context_data['order_by_fields'] = self.order_by_fields
 
-        for i in range(0,3):
+        for i in range(0, 3):
             try:
                 context_data['order_by_{}'.format(i)] = self.order_by[i]
             except IndexError:
@@ -319,9 +340,11 @@ class TicketList(PermissionRequiredMixin, ListView):
         if self.request.POST.get('vista__name'):
             context_data['vista__name'] = self.request.POST.get('vista__name')
 
-        context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
+        context_data['ticket_labels'] = {field.name: field.verbose_name.title(
+        ) for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel'}
 
         return context_data
+
 
 class TicketTicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, CreateView):
     permission_required = 'libtekticket.add_ticket'
@@ -341,12 +364,12 @@ class TicketTicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, Creat
 
         context_data = super().get_context_data(**kwargs)
 
-        context_data['ticket'] = Ticket.objects.get(pk=self.kwargs.get('ticketpk'))
+        context_data['ticket'] = Ticket.objects.get(
+            pk=self.kwargs.get('ticketpk'))
 
         return context_data
 
     def form_valid(self, form):
-
 
         ticket = Ticket.objects.get(pk=self.kwargs.get('ticketpk'))
 
@@ -356,7 +379,8 @@ class TicketTicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, Creat
 
         response = super().form_valid(form)
 
-        ticket_url = self.request.build_absolute_uri( reverse('libtekticket:ticket-detail', kwargs={'pk':self.object.ticket.pk}) )
+        ticket_url = self.request.build_absolute_uri(
+            reverse('libtekticket:ticket-detail', kwargs={'pk': self.object.ticket.pk}))
         mail_message = "\r".join(
             [
                 f"Update to { self.object.ticket }: {self.object.text }"
@@ -378,12 +402,12 @@ class TicketTicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, Creat
 
         mail_recipients = [
             tech.user.email for tech in Technician.objects.filter(user__isnull=False).filter(user__email__gt='')
-        ] + ( [ self.object.submitted_by.email ] if self.object.submitted_by is not None and self.object.submitted_by.email > '' else [] )
+        ] + ([self.object.submitted_by.email] if self.object.submitted_by is not None and self.object.submitted_by.email > '' else [])
 
         send_mail(
             'Note added to Tech Ticket: ' + self.object.ticket.short_description,
             mail_message,
-            'suvapuli@tougshrire.com',
+            'tougshire@tougshire.com',
             mail_recipients,
             html_message=mail_html_message,
             fail_silently=False,
@@ -399,6 +423,7 @@ class TicketTicketNoteCreate(UserPassesTestMixin, PermissionRequiredMixin, Creat
             return reverse_lazy('libtekticket:ticket-ticketnote-close', kwargs={'pk': self.object.pk})
         else:
             return reverse_lazy('libtekticket:ticket-detail', kwargs={'pk': ticket.pk})
+
 
 class TicketTicketNoteClose(PermissionRequiredMixin, DetailView):
     permission_required = 'libtekticket.add_ticket'
