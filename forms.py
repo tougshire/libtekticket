@@ -32,11 +32,10 @@ class TicketForm(forms.ModelForm):
         }
 
 
-class TicketNoteForm(forms.ModelForm):
+class TicketTicketNoteForm(forms.ModelForm):
     class Meta:
         model = TicketNote
         fields = [
-            'ticket',
             'when',
             'text',
         ]
@@ -45,4 +44,4 @@ class TicketNoteForm(forms.ModelForm):
             'text':forms.TextInput(attrs={'class':'len100'})
         }
 
-TicketTicketNoteFormset = inlineformset_factory(Ticket, TicketNote, form=TicketNoteForm, extra=10)
+TicketTicketNoteFormset = inlineformset_factory(Ticket, TicketNote, form=TicketTicketNoteForm, extra=10)

@@ -10,11 +10,7 @@
 
     <h3>Notes</h3>
     {% user_is_editor object user as editor %}
-    {% if editor %}
-      {% if perms.libtekticket.add_ticket %}
-        <div><a id="a_addnote" href="{% url 'libtekticket:ticket-ticketnote-create' object.pk %}">Add Note</a></div>
-      {% endif %}
-    {% endif %}
+    <table>
     {% for ticketnote in object.ticketnote_set.all %}
       <div class="relatedset relatedticketnote" id="div_ticketnote-{{ forloop.counter0 }}">
         <div class="fieldWrapper">
@@ -23,7 +19,7 @@
               Note:
             </div>
             <div class="field">
-              {{ ticketnote.when }}: {{ ticketnote.text }}
+              {{ ticketnote.when }}: {{ ticketnote.text }} --{{ ticketnote.submitted_by }}
             </div>
           </div>
         </div>

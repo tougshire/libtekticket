@@ -20,6 +20,11 @@ class Technician(models.Model):
         blank=True,
         help_text='The name of the technician'
     )
+    is_current = models.BooleanField(
+        'current',
+        default=True,
+        help_text='If this technician is current (should receive emails from tickets, etc)'
+    )
 
     def __str__(self):
         return f"{self.name}"
@@ -57,9 +62,9 @@ class Ticket(models.Model):
         'Urgency',
         choices=(
             (1, '1) Safety Hazard or Work Stoppage'),
-            (2, '2'),
-            (3, '3) Important Issue'),
-            (4, '4'),
+            (2, '2) Major Work Impediment'),
+            (3, '3) Highly Important Issue'),
+            (4, '4) Moderately Important Issue'),
             (5, '5) Minor Issue or Suggestion')
         ),
         help_text='The urgency, on a scale of 1 to 5, where 1 is the most urgent'

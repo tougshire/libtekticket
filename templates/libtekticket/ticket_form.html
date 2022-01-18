@@ -64,7 +64,7 @@
         </tr>
         {% for ticketnote in object.ticketnote_set.all %}
           <tr id="tr_ticketnote_{{ ticketnote.id }}">
-            <td><button type="button" id="button_editticketnote_{{ ticketnote.id }}" data-formid="div_ticketnoteform_{{ ticketnote.id }}" data-displayid="tr_ticketnote_{{ ticketnote.id }}" class="ticketnote_edit_button">edit</button></td><td>{{ ticketnote.when }}</td><td>{{ ticketnote.text }}</td><td>{{ ticketnote.is_major }}</td>
+            <td>{{ ticketnote.when }}</td><td>{{ ticketnote.text }}</td><td>{{ ticketnote.is_major }}</td>
           </tr>
         {% endfor %}
       </table>
