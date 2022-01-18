@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import inlineformset_factory
 from .models import Ticket, TicketNote
 
 class ItemSelect(forms.Select):
@@ -12,8 +13,6 @@ class ItemSelect(forms.Select):
 
 class TicketForm(forms.ModelForm):
     def __init__(self, **kwargs):
-        print('tp m16830')
-        print(getattr(self._meta, 'fields'))
         return super().__init__(**kwargs)
 
     class Meta:
@@ -33,10 +32,11 @@ class TicketForm(forms.ModelForm):
         }
 
 
-class TicketTicketNoteForm(forms.ModelForm):
+class TicketNoteForm(forms.ModelForm):
     class Meta:
         model = TicketNote
         fields = [
+            'ticket',
             'when',
             'text',
         ]
@@ -45,4 +45,4 @@ class TicketTicketNoteForm(forms.ModelForm):
             'text':forms.TextInput(attrs={'class':'len100'})
         }
 
-#TicketTicketNoteFormSet = forms.inlineformset_factory(Ticket, TicketNote, TicketNoteForm, extra=0)
+TicketTicketNoteFormset = inlineformset_factory(Ticket, TicketNote, form=TicketNoteForm, extra=10)

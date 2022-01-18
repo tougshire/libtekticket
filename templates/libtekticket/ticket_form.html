@@ -31,50 +31,50 @@
           {% include './_form_field.html' with field=form.technician %}
         </div>
       {% endif %}
-      <div id="div_service_number">
-        {% include './_form_field.html' with field=form.service_number %}
-      </div>
 
       {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit</button>' %}
+
       <h3>Notes</h3>
 
-      {% if object.pk %}
-        {% user_is_editor object user as editor %}
-        {% if editor %}
-          {% if perms.libtekticket.add_ticket %}
-            <div><a id="a_addnote" href="{% url 'libtekticket:ticket-ticketnote-create' object.pk %}">Add Note</a></div>
-          {% endif %}
+      {{ ticketnotes.management_form }}
+      {% for ticketnoteform in ticketnotes.forms %}
+        {% if ticketnoteform.id.value > 0 %}
+          <div id="div_ticketnoteform_{{ ticketnoteform.id.value }}" class="ticketnoteformsetform"  >
+            {% for hiddenfield in ticketnoteform.hidden_fields %}
+              {{ hiddenfield }}
+            {% endfor %}
+            {% include './_form_field.html' with field=ticketnoteform.when %}
+            {% include './_form_field.html' with field=ticketnoteform.text %}
+            {% include './_form_field.html' with field=ticketnoteform.DELETE %}
+          </div>
+        {% else %}
+          <div class="ticketnoteformsetform ticketnotenewform" >
+            {% for hiddenfield in ticketnoteform.hidden_fields %}
+              {{ hiddenfield }}
+            {% endfor %}
+            {% include './_form_field.html' with field=ticketnoteform.when %}
+            {% include './_form_field.html' with field=ticketnoteform.text %}
+            {% include './_form_field.html' with field=ticketnoteform.DELETE %}
+          </div>
         {% endif %}
-      {% endif %}
+      {% endfor %}
+      <table>
+        <tr>
+          <td><button type="button" id="button_addticketnote">Add</button></td><td span="*"></td>
+        </tr>
+        {% for ticketnote in object.ticketnote_set.all %}
+          <tr id="tr_ticketnote_{{ ticketnote.id }}">
+            <td><button type="button" id="button_editticketnote_{{ ticketnote.id }}" data-formid="div_ticketnoteform_{{ ticketnote.id }}" data-displayid="tr_ticketnote_{{ ticketnote.id }}" class="ticketnote_edit_button">edit</button></td><td>{{ ticketnote.when }}</td><td>{{ ticketnote.text }}</td><td>{{ ticketnote.is_major }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+
+      {% include './_form_button.html' with label="Submit Form" button='<button type="submit">Submit</button>' %}
 
     </div>
+
   </form>
-  {% for ticketnote in object.ticketnote_set.all %}
-    <div class="relatedset relatedticketnote" id="div_ticketnote-{{ forloop.counter0 }}">
-      <div class="fieldWrapper">
-        <div class="control">
-          <div class="label">
-            Note:
-          </div>
-          <div class="field">
-            {{ ticketnote.when }}: {{ ticketnote.text }}
-          </div>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-  <div class="relatedset relatedticketnote" id="div_ticketnote-empty" style="display:none">
-    <div class="fieldWrapper">
-      <div class="control">
-        <div class="label">
-          Note:
-        </div>
-        <div class="field">
-          <span data-field="when"></span> : <span data-field="text"></span>
-        </div>
-      </div>
-    </div>
-  </div>
+
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
@@ -152,6 +152,40 @@
       newdiv.style.display="block"
       emptydiv.parentNode.insertBefore(newdiv, emptydiv)
     }
+  </script>
+  <script>
+    function enableFormsetForm(formid, displayid) {
+      let form = document.getElementById(formid)
+      document.getElementById(formid).style.display="block"
+      document.getElementById(displayid).style.display="none"
+    }
+    let ticketnoteEditButtons = document.getElementsByClassName('ticketnote_edit_button')
+    for( ticketnoteEditButton of ticketnoteEditButtons){
+      ticketnoteEditButton.addEventListener('click', function(e){
+        e.preventDefault()
+        enableFormsetForm(e.target.dataset.formid, e.target.dataset.displayid)
+      })
+    }
+    function enableAddFormsetForm(formclass) {
+      let newforms = document.getElementsByClassName(formclass)
+      if( newforms.length > 0) {
+        let newform = newforms[0]
+        newform.style.display="block"
+        newform.classList.remove(formclass)
+      } else {
+        alert('please save before adding more')
+      }
+    }
+
+    document.getElementById('button_addticketnote').addEventListener('click', function(e){
+      e.preventDefault()
+      enableAddFormsetForm('ticketnotenewform')
+    })
+    let ticketnoteforms = document.getElementsByClassName("ticketnoteformsetform")
+    for( ticketnoteform of ticketnoteforms ){
+      ticketnoteform.style.display="none"
+    }
+
   </script>
 
 {% endblock %}
