@@ -182,9 +182,9 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
 
         if(ticketnotes).is_valid():
             for form in ticketnotes.forms:
-                ticketnote = form.save(commit=false)
-                if ticketnote.submiitted_by is none:
-                    ticketnote.submitted_by = self.request.user
+                ticketnote = form.save(commit=False)
+                if ticketnote.submitted_by is None:
+                    ticketnote.submtted_by = self.request.user
             ticketnotes.save()
         else:
             return self.form_invalid(form)
