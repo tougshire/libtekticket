@@ -24,6 +24,8 @@ class TicketForm(forms.ModelForm):
             'long_description',
             'urgency',
             'technician',
+            'is_resolved',
+            'resolution_notes'
         ]
         widgets = {
             'item':ItemSelect,

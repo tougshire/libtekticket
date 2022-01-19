@@ -88,8 +88,15 @@ class Ticket(models.Model):
         on_delete=models.SET_NULL,
         help_text='The technician responsible for responding to this ticket'
     )
-    resolution = models.TextField(
-        'Resolution',
+    is_resolved = models.BooleanField(
+        'is resolved',
+        blank=True,
+        default=False,
+        help_text = 'If the problem is resolved'
+
+    )
+    resolution_notes = models.TextField(
+        'resolution notes',
         blank=True,
         help_text='How the problem was resolved'
     )
