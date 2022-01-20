@@ -15,6 +15,7 @@ from tougshire_vistas.models import Vista
 from django.contrib.auth import get_user_model
 from .forms import TicketForm, TicketTicketNoteForm, TicketTicketNoteFormset
 from .models import Technician, History, Ticket, TicketNote
+from tougshire_vistas.views import get_vista_object
 
 from libtekin.models import Item, Mmodel
 
@@ -237,15 +238,103 @@ class TicketSoftDelete(PermissionRequiredMixin, UpdateView):
 
         return context_data
 
-
 class TicketList(PermissionRequiredMixin, ListView):
     permission_required = 'libtekticket.view_ticket'
     model = Ticket
     filter_object = {}
     exclude_object = {}
     order_by = []
+    order_by_fields=[]
+    combined_text_search=""
+    combined_text_fields=[
+            'item__common_name',
+            'item__mmodel__model_name',
+            'item__primary_id',
+            'submitted_by__display_name',
+    ]
+
+    for fieldname in ['when', 'item', 'urgency',]:
+        order_by_fields.append(
+            { 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title() }
+        )
+        order_by_fields.append(
+            { 'name':'-' + fieldname, 'label':'{} reverse'.format(Ticket._meta.get_field(fieldname).verbose_name.title()) }
+        )
+    filter_fields = {
+        'in':['item', 'item__mmodel', 'urgency'],
+        'is':['is_resolved'],
+        'after':['when']
+    }
+    # showable_columns = []
+    # show_columns = []
+    # for fieldname in [
+    #         'common_name',
+    #         'mmodel',
+    #         'primary_id_field',
+    #         'serial_number',
+    #         'service_number',
+    #         'asset_number',
+    #         'barcode',
+    #         'condition',
+    #         'network_name',
+    #         'assignee',
+    #         'owner',
+    #         'borrower',
+    #         'home',
+    #         'location',
+    #         'role',
+    #         'latest_inventory'
+    #     ]:
+    #     showable_columns.append(
+    #         {
+    #             'name':fieldname,
+    #             'label':Ticket._meta.get_field(fieldname).verbose_name.title()
+    #         }
+    #     )
+    #     show_columns.append(fieldname)
+
+    def post(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+
+        vista_object = get_vista_object(self, super().get_queryset(), 'libtekticket.ticket' )
+        self.filter_object = vista_object['filter_object']
+        self.order_by = vista_object['order_by']
+        self.show_columns = vista_object['show_columns']
+        self.combined_text_search = vista_object['combined_text_search']
+        return vista_object['queryset']
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['mmodels'] = Mmodel.objects.all()
+        context_data['urgencies'] = Ticket.URGENCY_CHOICES
+        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekticket.ticket').all()
+        context_data['order_by_fields'] = self.order_by_fields
+        context_data['order_by'] = self.order_by
+        # context_data['showable_columns'] = self.showable_columns
+        # context_data['show_columns'] = self.show_columns
+        context_data['combined_text_search'] = self.combined_text_search
+        context_data['ordering'] = Ticket._meta.ordering
+
+        if self.filter_object:
+            context_data['filter_object'] = self.filter_object
+        if self.request.POST.get('vista__name'):
+            context_data['vista__name'] = self.request.POST.get('vista__name')
+
+        context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
+
+        return context_data
+
+
+class xTicketList(PermissionRequiredMixin, ListView):
+    permission_required = 'libtekticket.view_ticket'
+    model = Ticket
+    filter_object = {}
+    exclude_object = {}
+    order_by = []
     order_by_fields = []
-    for fieldname in ['item', 'urgency']:
+    for fieldname in ['when', 'urgency', 'item',]:
         order_by_fields.append(
             {'name': fieldname, 'label': Ticket._meta.get_field(
                 fieldname).verbose_name.title()}
@@ -272,7 +361,7 @@ class TicketList(PermissionRequiredMixin, ListView):
                         if self.request.POST.get(order_by_i) == field['name']:
                             order_by.append(field['name'])
 
-            for fieldname in ['mmodel', 'mmodel__category', 'condition', 'role']:
+            for fieldname in ['mmodel', 'urgency', 'role']:
                 filterfieldname = 'filter__' + fieldname + '__in'
                 if filterfieldname in self.request.POST and self.request.POST.get(filterfieldname) > '':
                     postfields = self.request.POST.getlist(filterfieldname)
@@ -378,14 +467,8 @@ class TicketList(PermissionRequiredMixin, ListView):
         context_data['users'] = get_user_model().objects.all()
         context_data['vistas'] = Vista.objects.filter(
             user=self.request.user, model_name='libtekticket.ticket').all()
+        context_data['ordering'] = Ticket._meta.ordering
         context_data['order_by_fields'] = self.order_by_fields
-
-        for i in range(0, 3):
-            try:
-                context_data['order_by_{}'.format(i)] = self.order_by[i]
-            except IndexError:
-                pass
-
         if self.filter_object:
             context_data['filter_object'] = self.filter_object
         if self.request.POST.get('vista__name'):

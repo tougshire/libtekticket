@@ -34,6 +34,13 @@ class Technician(models.Model):
         return user in [ technician.user for technician in Technician.objects.all() ]
 
 class Ticket(models.Model):
+    URGENCY_CHOICES = (
+            (1, '1) Safety Hazard or Work Stoppage'),
+            (2, '2) Major Work Impediment'),
+            (3, '3) Highly Important Issue'),
+            (4, '4) Moderately Important Issue'),
+            (5, '5) Minor Issue or Suggestion')
+    )
     item = models.ForeignKey(
         Item,
         on_delete=models.SET_NULL,
@@ -60,13 +67,7 @@ class Ticket(models.Model):
     )
     urgency = models.IntegerField(
         'Urgency',
-        choices=(
-            (1, '1) Safety Hazard or Work Stoppage'),
-            (2, '2) Major Work Impediment'),
-            (3, '3) Highly Important Issue'),
-            (4, '4) Moderately Important Issue'),
-            (5, '5) Minor Issue or Suggestion')
-        ),
+        choices=URGENCY_CHOICES,
         help_text='The urgency, on a scale of 1 to 5, where 1 is the most urgent'
     )
     submitted_by = models.ForeignKey(
@@ -108,7 +109,7 @@ class Ticket(models.Model):
         return user == self.submitted_by or user.has_perm('libtekticket.change_ticket')
 
     class Meta:
-        ordering=['-when']
+        ordering=['-when', 'urgency']
 
 
 class TicketNote(models.Model):

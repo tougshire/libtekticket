@@ -11,19 +11,37 @@
           </div>
           <div class="field">
             <select name="order_by">
-              {% for field in order_by_fields %}
-                <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
+              {% if order_by.0 %}
+                {% for field in order_by_fields %}
+                  <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              {% else %}
+                {% for field in order_by_fields %}
+                  <option value="{{ field.name }}"{% if ordering.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              {% endif %}
             </select>
             <select name="order_by">
-              {% for field in order_by_fields %}
-                <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
+              {% if order_by.1 %}
+                {% for field in order_by_fields %}
+                  <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              {% else %}
+                {% for field in order_by_fields %}
+                  <option value="{{ field.name }}"{% if ordering.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              {% endif %}
             </select>
             <select name="order_by">
-              {% for field in order_by_fields %}
-                <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
+              {% if order_by.2 %}
+                {% for field in order_by_fields %}
+                  <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              {% else %}
+                {% for field in order_by_fields %}
+                  <option value="{{ field.name }}"{% if ordering.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+                {% endfor %}
+              {% endif %}
             </select>
           </div>
         </div>
@@ -41,7 +59,17 @@
       <div class="field-wrapper">
         <div class="control">
           <div class="label">
-            Item is in
+            Is Resolved
+          </div>
+          <div class="field">
+            <input type="checkbox" name="filter__is_resolved"{% if filter_object.resolved %} checked="CHECKED"{% endif %}>
+          </div>
+        </div>
+      </div>
+      <div class="field-wrapper">
+        <div class="control">
+          <div class="label">
+            Item is
           </div>
           <div class="field">
             <select multiple name="filter__item__in">
@@ -56,7 +84,7 @@
       <div class="field-wrapper">
         <div class="control">
           <div class="label">
-            Model is in
+            Model is
           </div>
           <div class="field">
             <select multiple name="filter__item__mmodel__in">
@@ -71,7 +99,7 @@
       <div class="field-wrapper">
         <div class="control">
           <div class="label">
-            Submitter is in
+            Submitter is
           </div>
           <div class="field">
             <select multiple name="filter__submitted_by__in">
