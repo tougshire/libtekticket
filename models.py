@@ -75,7 +75,7 @@ class Ticket(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name='submitted by',
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         help_text='The user who submitted this ticket'
     )
     when = models.DateTimeField(
