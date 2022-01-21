@@ -1,10 +1,9 @@
 from django.db import models
 from django.conf import settings
-from datetime import date
+from datetime import datetime
 from django.apps import apps
 from libtekin.models import Item, Location
 from django.contrib.auth import get_user_model
-import datetime
 
 class Technician(models.Model):
     user = models.ForeignKey(
@@ -79,7 +78,7 @@ class Ticket(models.Model):
         help_text='The user who submitted this ticket'
     )
     when = models.DateTimeField(
-        default=datetime.date.today,
+        default=datetime.now,
         help_text='The date and time the ticket was submitted'
     )
     technician = models.ForeignKey(
@@ -134,7 +133,7 @@ class TicketNote(models.Model):
     )
     when = models.DateField(
         'when',
-        default=date.today,
+        default=datetime.now,
         help_text='The effective date of the note (when it applies as opposed to when it was actually made)'
     )
 
