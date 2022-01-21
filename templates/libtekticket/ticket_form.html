@@ -86,7 +86,7 @@
       var locationField = document.getElementById('{{ form.location.id_for_label }}')
       var itemSelectedOptions = itemField.selectedOptions
       if(itemSelectedOptions.length==1) {
-        locationField.value=itemSelectedOptions[0].getAttribute('data-location')
+        locationField.value=itemSelectedOptions[0].getAttribute('data-home')
       }
     }
     document.getElementById('{{ form.item.id_for_label }}').addEventListener('change', function() {
