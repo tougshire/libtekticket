@@ -6,8 +6,15 @@ class ItemSelect(forms.Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value:
+            textforfilter = f'{name}|{value.instance.primary_id}'
             if value.instance.location is not None:
-                option['attrs']['data-location'] = value.instance.location.pk
+                option['attrs']['data-home'] = value.instance.home.pk
+                textforfilter = textforfilter + f'|{value.instance.home.short_name}|{value.instance.home.full_name}'
+
+            if value.instance.assignee is not None:
+                textforfilter = textforfilter + f'|{value.instance.assignee.friendly_name}|{value.instance.assignee.full_name}'
+                option['attrs']['data-textforfilter'] = textforfilter
+
         return option
 
 
