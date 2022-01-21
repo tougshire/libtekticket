@@ -4,6 +4,7 @@ from datetime import date
 from django.apps import apps
 from libtekin.models import Item, Location
 from django.contrib.auth import get_user_model
+import datetime
 
 class Technician(models.Model):
     user = models.ForeignKey(
@@ -78,7 +79,7 @@ class Ticket(models.Model):
         help_text='The user who submitted this ticket'
     )
     when = models.DateTimeField(
-        auto_now_add=True,
+        default=datetime.date.today,
         help_text='The date and time the ticket was submitted'
     )
     technician = models.ForeignKey(
