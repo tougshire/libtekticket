@@ -191,6 +191,9 @@
         {% if 'when' in show_columns or not show_columns %}
           {% include './_list_head.html' with field=ticket_labels.when %}
         {% endif %}
+        {% if 'is_resolved' in show_columns or not show_columns %}
+          {% include './_list_head.html' with field=ticket_labels.is_resolved %}
+        {% endif %}
       </div>
 
       {% for item in object_list %}
@@ -216,6 +219,9 @@
               {% include './_list_field.html' with field=when_formatted %}
             {% endif %}
           {% endwith %}
+          {% if 'is_resolved' in show_columns or not show_columns %}
+            {% include './_list_field.html' with field=item.is_resolved|yesno %}
+          {% endif %}
         </div>
       {% endfor %}
 
