@@ -265,7 +265,7 @@ class TicketList(PermissionRequiredMixin, ListView):
         )
     filter_fields = {
         'in':['item', 'item__mmodel', 'urgency'],
-        'is':['is_resolved'],
+        'exact':['is_resolved'],
         'after':['when']
     }
     # showable_columns = []
@@ -319,6 +319,8 @@ class TicketList(PermissionRequiredMixin, ListView):
         # context_data['show_columns'] = self.show_columns
         context_data['combined_text_search'] = self.combined_text_search
         context_data['ordering'] = Ticket._meta.ordering
+        context_data['items'] = Item.objects.all()
+        context_data['users'] = get_user_model().objects.all()
 
         if self.filter_object:
             context_data['filter_object'] = self.filter_object

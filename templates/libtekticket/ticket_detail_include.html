@@ -8,6 +8,9 @@
     {% include './_detail_field.html' with label=ticket_labels.long_description field=object.long_description %}
     {% include './_detail_field.html' with label=ticket_labels.urgency field=object.urgency %}
     {% include './_detail_field.html' with label=ticket_labels.submitted_by field=object.submitted_by %}
+    {% include './_detail_field.html' with label=ticket_labels.is_resolved field=object.is_resolved|yesno %}
+    {% include './_detail_field.html' with label=ticket_labels.resolution_notes field=object.resolution_notes %}
+
 
     <h3>Notes</h3>
     {% user_is_editor object user as editor %}

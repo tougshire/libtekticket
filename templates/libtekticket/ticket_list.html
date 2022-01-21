@@ -1,4 +1,5 @@
 {% extends './_base.html' %}
+{% load static %}
 {% block content %}
   <button type="button" id='btn_showviewform' class="show">Show Sort/Filter form</button>
   <div id='div_viewform' class="viewform hidden" >
@@ -62,7 +63,11 @@
             Is Resolved
           </div>
           <div class="field">
-            <input type="checkbox" name="filter__is_resolved"{% if filter_object.resolved %} checked="CHECKED"{% endif %}>
+            <select name="filter__is_resolved__exact">
+              <option value="">--</option>
+              <option value="True"{% if 'is_resolved__exact' in filter_object %}{% if filter_object.is_resolved__exact == "True" %} selected="SELECTED" {% endif %}{% endif %}>Yes</option>
+              <option value="False"{% if 'is_resolved__exact' in filter_object %}{% if filter_object.is_resolved__exact == "False" %} selected="SELECTED" {% endif %}{% endif %}>No</option>
+            </select>
           </div>
         </div>
       </div>
@@ -72,7 +77,7 @@
             Item is
           </div>
           <div class="field">
-            <select multiple name="filter__item__in">
+            <select multiple id="ctrl__filter__item__in" name="filter__item__in">
               {% for item in items %}
                 <option value="{{ item.pk }}"{% if 'item__in' in filter_object %}{% if item.pk|lower in filter_object.item__in %} selected="SELECTED" {% endif %}{% endif %}>{{ item }}</option>
               {% endfor %}
@@ -102,7 +107,7 @@
             Submitter is
           </div>
           <div class="field">
-            <select multiple name="filter__submitted_by__in">
+            <select multiple id="ctrl__filter__submitted_by__in" name="filter__submitted_by__in" >
               {% for user in users %}
                 <option value="{{ user.pk }}"{% if 'user__in' in filter_object %}{% if user.pk|lower in filter_object.item__user__in %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
               {% endfor %}
@@ -230,6 +235,7 @@
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
+  <script src="{% static 'touglates/touglates.js' %}"></script>
   <script>
 
     function toggleSortFilterForm() {
@@ -262,5 +268,11 @@
         }
       }
     });
+  </script>
+  <script>
+    addFilterInput("ctrl__filter__item__in")
+  </script>
+  <script>
+    addFilterInput("ctrl__filter__item__in")
   </script>
 {% endblock %}
