@@ -256,7 +256,7 @@ class TicketList(PermissionRequiredMixin, ListView):
             'long_description',
     ]
 
-    for fieldname in ['when', 'item', 'urgency',]:
+    for fieldname in ['when', 'item', 'urgency']:
         order_by_fields.append(
             { 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title() }
         )
@@ -264,7 +264,7 @@ class TicketList(PermissionRequiredMixin, ListView):
             { 'name':'-' + fieldname, 'label':'{} reverse'.format(Ticket._meta.get_field(fieldname).verbose_name.title()) }
         )
     filter_fields = {
-        'in':['item', 'item__mmodel', 'urgency'],
+        'in':['item', 'item__mmodel', 'urgency','submitted_by'],
         'exact':['is_resolved'],
         'after':['when']
     }

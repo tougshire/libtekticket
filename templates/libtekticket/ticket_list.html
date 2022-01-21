@@ -109,7 +109,7 @@
           <div class="field">
             <select multiple id="ctrl__filter__submitted_by__in" name="filter__submitted_by__in" >
               {% for user in users %}
-                <option value="{{ user.pk }}"{% if 'user__in' in filter_object %}{% if user.pk|lower in filter_object.item__user__in %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
+                <option value="{{ user.pk }}"{% if 'submitted_by__in' in filter_object %}{% if user.pk|lower in filter_object.submitted_by__in %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
               {% endfor %}
             </select>
             <input type="checkbox" name="filter__mmodel__none">
