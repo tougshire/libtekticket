@@ -85,14 +85,8 @@ def send_ticket_mail(ticket, request, is_new=False):
         tech.user.email for tech in Technician.objects.filter(is_current=True).filter(user__isnull=False)
     ]
 
-    print('tp m15f46 mail recipients')
-    print(mail_recipients)
-
     if ticket.submitted_by.email is not None:
         mail_recipients.append(ticket.submitted_by.email)
-
-    print('tp m15f47 mail recipients')
-    print(mail_recipients)
 
     send_mail(
         mail_subject,
@@ -128,20 +122,18 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
         self.object.submitted_by = self.request.user
         self.object.save()
 
-        if self.request.POST:
-            ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
-        else:
-            ticketnotes = TicketTicketNoteFormset(instance=self.object)
+        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
 
         if(ticketnotes).is_valid():
-
             for form in ticketnotes.forms:
-                ticketnote = form.save(commit=False)
-                if ticketnote.submitted_by is None:
-                    ticketnote.submitted_by = self.request.user
-
+                if form.has_changed():
+                    ticketnote = form.save(commit=False)
+                    if ticketnote.submitted_by is None:
+                        ticketnote.submitted_by = self.request.user
             ticketnotes.save()
         else:
+            for form in ticketnotes.forms:
+                print( form.errors )
             return self.form_invalid(form)
 
         send_ticket_mail(self.object, self.request, is_new=True)
@@ -176,16 +168,16 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
 
         self.object = form.save()
 
-        if self.request.POST:
-            ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
-        else:
-            ticketnotes = TicketTicketNoteFormset(instance=self.object)
+        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
 
         if(ticketnotes).is_valid():
-            for form in ticketnotes.forms:
-                ticketnote = form.save(commit=False)
-                if ticketnote.submitted_by is None:
-                    ticketnote.submtted_by = self.request.user
+
+            # for form in ticketnotes.forms:
+            #     if form.has_changed():
+            #         ticketnote = form.save(commit=False)
+            #         if ticketnote.submitted_by is None:
+            #             ticketnote.submtted_by = self.request.user
+
             ticketnotes.save()
         else:
             return self.form_invalid(form)

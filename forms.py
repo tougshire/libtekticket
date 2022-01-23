@@ -49,7 +49,7 @@ class TicketTicketNoteForm(forms.ModelForm):
             'text',
         ]
         widgets={
-            'when':forms.DateInput(attrs={'type':'date'}),
+            'when':forms.DateTimeInput(format='%Y-%m-%dT%H:%M:%S',  attrs={'type':'datetime-local'} ),
             'text':forms.TextInput(attrs={'class':'len100'})
         }
 

@@ -121,6 +121,7 @@ class TicketNote(models.Model):
     )
     text = models.CharField(
         'text',
+        blank=True,
         max_length=255,
         help_text='The text of the note'
     )
@@ -131,10 +132,10 @@ class TicketNote(models.Model):
         on_delete=models.SET_NULL,
         help_text='The user who submitted this note'
     )
-    when = models.DateField(
+    when = models.DateTimeField(
         'when',
         default=datetime.now,
-        help_text='The effective date of the note (when it applies as opposed to when it was actually made)'
+        help_text='The date that the note was submitted'
     )
 
     def __str__(self):
