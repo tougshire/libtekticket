@@ -63,10 +63,11 @@
             Is Resolved
           </div>
           <div class="field">
-            <select name="filter__is_resolved__exact">
+            <input type="hidden" name="filterop__is_resolved" value="exact">
+            <select name="filterfield__is_resolved">
               <option value="">--</option>
-              <option value="True"{% if 'is_resolved__exact' in filter_object %}{% if filter_object.is_resolved__exact == "True" %} selected="SELECTED" {% endif %}{% endif %}>Yes</option>
-              <option value="False"{% if 'is_resolved__exact' in filter_object %}{% if filter_object.is_resolved__exact == "False" %} selected="SELECTED" {% endif %}{% endif %}>No</option>
+              <option value="True"{% if filterfield__is_resolved %}{% if filterfield__is_resolved == "True" %} selected="SELECTED" {% endif %}{% endif %}>Yes</option>
+              <option value="False"{% if filterfield__is_resolved %}{% if filterfield__is_resolved == "False" %} selected="SELECTED" {% endif %}{% endif %}>No</option>
             </select>
           </div>
         </div>
@@ -77,27 +78,13 @@
             Item is
           </div>
           <div class="field">
-            <select multiple id="ctrl__filter__item__in" name="filter__item__in">
+            <input type="hidden" name="filterop__item" value="in">
+            <select multiple name="filterfield__item">
               {% for item in items %}
-                <option value="{{ item.pk }}"{% if 'item__in' in filter_object %}{% if item.pk|lower in filter_object.item__in %} selected="SELECTED" {% endif %}{% endif %}>{{ item }}</option>
+                <option value="{{ item.pk }}"{% if filterfield__item %}{% if item.pk|lower in filterfield__item %} selected="SELECTED" {% endif %}{% endif %}>{{ item }}</option>
               {% endfor %}
             </select>
-            <input type="checkbox" name="filter__mmodel__none">
-          </div>
-        </div>
-      </div>
-      <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Model is
-          </div>
-          <div class="field">
-            <select multiple name="filter__item__mmodel__in">
-              {% for mmodel in mmodels %}
-                <option value="{{ mmodel.pk }}"{% if 'item__mmodel__in' in filter_object %}{% if mmodel.pk|lower in filter_object.item__mmodel__in %} selected="SELECTED" {% endif %}{% endif %}>{{ mmodel }}</option>
-              {% endfor %}
-            </select>
-            <input type="checkbox" name="filter__mmodel__none">
+            None:<input type="checkbox" name="filterop__item" value="isnull" {% if 'isnull' in filterop__item %}checked="CHECKED" {% endif %}>
           </div>
         </div>
       </div>
@@ -106,10 +93,11 @@
           <div class="label">
             Submitter is
           </div>
+          <input type="hidden" name="filterop__submitted_by" value="in">
           <div class="field">
-            <select multiple id="ctrl__filter__submitted_by__in" name="filter__submitted_by__in" >
+            <select multiple id="ctrl__filtefield__submitted_by" name="filterfield__submitted_by" >
               {% for user in users %}
-                <option value="{{ user.pk }}"{% if 'submitted_by__in' in filter_object %}{% if user.pk|lower in filter_object.submitted_by__in %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
+                <option value="{{ user.pk }}"{% if filterfield__submitted_by %}{% if user.pk|lower in filterfield__submitted_by %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
               {% endfor %}
             </select>
             <input type="checkbox" name="filter__mmodel__none">
@@ -134,7 +122,7 @@
             &nbsp;
           </div>
           <div class="field">
-            <button type="submit" name="query_submitted" value='True'>Submit</button>
+            <button type="submit" name="vista_query_submitted" value='True'>Submit</button>
           </div>
         </div>
         <div class="help_text">
