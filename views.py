@@ -15,7 +15,7 @@ from tougshire_vistas.models import Vista
 from django.contrib.auth import get_user_model
 from .forms import TicketForm, TicketTicketNoteForm, TicketTicketNoteFormset
 from .models import Technician, History, Ticket, TicketNote
-from tougshire_vistas.views import make_vista, retrieve_vista
+from tougshire_vistas.views import make_vista, retrieve_vista, get_latest_vista
 
 from libtekin.models import Item, Mmodel, Location
 
@@ -303,6 +303,11 @@ class TicketList(PermissionRequiredMixin, ListView):
             vistaobj = make_vista(self.request, self.vista_settings, super().get_queryset())
         elif 'get_vista' in self.request.POST:
             vistaobj = retrieve_vista(self.request, self.vista_settings, super().get_queryset())
+        else:
+            try:
+                vistaobj =  get_latest_vista(self.request, self.vista_settings, super().get_queryset())
+            except Exception as e:
+                print(e)
 
         for key in vistaobj['context']:
             self.vista_context[key] = vistaobj['context'][key]
