@@ -13,22 +13,22 @@
           <div class="field">
             <select name="order_by">
               {% if order_by.0 %}
-                {% for field in order_by_fields %}
+                {% for field in order_by_fields_available %}
                   <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
                 {% endfor %}
               {% else %}
-                {% for field in order_by_fields %}
+                {% for field in order_by_fields_available %}
                   <option value="{{ field.name }}"{% if ordering.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
                 {% endfor %}
               {% endif %}
             </select>
             <select name="order_by">
               {% if order_by.1 %}
-                {% for field in order_by_fields %}
+                {% for field in order_by_fields_available %}
                   <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
                 {% endfor %}
               {% else %}
-                {% for field in order_by_fields %}
+                {% for field in order_by_fields_available %}
                   <option value="{{ field.name }}"{% if ordering.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
                 {% endfor %}
               {% endif %}
@@ -39,7 +39,7 @@
                   <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
                 {% endfor %}
               {% else %}
-                {% for field in order_by_fields %}
+                {% for field in order_by_fields_available %}
                   <option value="{{ field.name }}"{% if ordering.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
                 {% endfor %}
               {% endif %}
