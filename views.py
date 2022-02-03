@@ -261,13 +261,15 @@ class TicketList(PermissionRequiredMixin, ListView):
             'when'
         ]
 
-        for fieldname in ['is_resolved', 'urgency', 'when', 'submitted_by', 'item',]:
-            self.vista_settings['order_by_fields_available'].append(
-                { 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title() }
-            )
-            self.vista_settings['order_by_fields_available'].append(
-                { 'name':'-' + fieldname, 'label':'{} reverse'.format(Ticket._meta.get_field(fieldname).verbose_name.title()) }
-            )
+        for fieldname in [
+            'is_resolved',
+            'urgency',
+            'when',
+            'submitted_by',
+            'item',
+        ]:
+            self.vista_settings['order_by_fields_available'].append(fieldname)
+            self.vista_settings['order_by_fields_available'].append('-' + fieldname)
 
         for fieldname in [
             'is_resolved',
@@ -277,12 +279,7 @@ class TicketList(PermissionRequiredMixin, ListView):
             'item',
             'short_description',
         ]:
-            self.vista_settings['columns_available'].append(
-                {
-                    'name':fieldname,
-                    'label':Ticket._meta.get_field(fieldname).verbose_name.title()
-                }
-            )
+            self.vista_settings['columns_available'].append(fieldname)
 
         return super().setup(request, *args, **kwargs)
 
@@ -299,9 +296,12 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         queryset = super().get_queryset()
         vistaobj={'context':{}, 'queryset':queryset}
+        if 'delete_vista' in self.request.POST:
+            delete_vista(self.request)
+
         if 'vista_query_submitted' in self.request.POST:
             vistaobj = make_vista(self.request, self.vista_settings, super().get_queryset())
-        elif 'get_vista' in self.request.POST:
+        elif 'retrieve_vista' in self.request.POST:
             vistaobj = retrieve_vista(self.request, self.vista_settings, super().get_queryset())
         else:
             try:
@@ -311,7 +311,6 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         for key in vistaobj['context']:
             self.vista_context[key] = vistaobj['context'][key]
-
 
         queryset = vistaobj['queryset']
 
@@ -327,7 +326,14 @@ class TicketList(PermissionRequiredMixin, ListView):
         context_data['order_by_fields_available'] = self.vista_settings['order_by_fields_available']
         context_data['columns_available'] = self.vista_settings['columns_available']
         context_data['ordering'] = Ticket._meta.ordering
+        for fieldname in self.vista_settings['order_by_fields_available']:
+            if fieldname[0] == '-':
+                context_data['order_by_fields_available'].append({ 'name':fieldname, 'label':Item._meta.get_field(fieldname[1:]).verbose_name.title() + ' [Reverse]'})
+            else:
+                context_data['order_by_fields_available'].append({ 'name':fieldname, 'label':Item._meta.get_field(fieldname).verbose_name.title()})
+        context_data['columns_available'] = [{ 'name':fieldname, 'label':Item._meta.get_field(fieldname).verbose_name.title() } for fieldname in self.vista_settings['columns_available']]
 
+        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekin.item').all()
         if self.request.POST.get('vista__name'):
             context_data['vista__name'] = self.request.POST.get('vista__name')
 
