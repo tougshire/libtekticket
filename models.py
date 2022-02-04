@@ -109,7 +109,7 @@ class Ticket(models.Model):
         return user == self.submitted_by or user.has_perm('libtekticket.change_ticket')
 
     class Meta:
-        ordering=['-when', 'urgency']
+        ordering=['is_resolved', '-when', 'urgency']
 
 
 class TicketNote(models.Model):

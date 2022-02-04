@@ -12,37 +12,19 @@
           </div>
           <div class="field">
             <select name="order_by">
-              {% if order_by.0 %}
-                {% for field in order_by_fields_available %}
-                  <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-                {% endfor %}
-              {% else %}
-                {% for field in order_by_fields_available %}
-                  <option value="{{ field.name }}"{% if ordering.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-                {% endfor %}
-              {% endif %}
+              {% for field in order_by_fields_available %}
+                <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+              {% endfor %}
             </select>
             <select name="order_by">
-              {% if order_by.1 %}
-                {% for field in order_by_fields_available %}
-                  <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-                {% endfor %}
-              {% else %}
-                {% for field in order_by_fields_available %}
-                  <option value="{{ field.name }}"{% if ordering.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-                {% endfor %}
-              {% endif %}
+              {% for field in order_by_fields_available %}
+                <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+              {% endfor %}
             </select>
             <select name="order_by">
-              {% if order_by.2 %}
-                {% for field in order_by_fields %}
-                  <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-                {% endfor %}
-              {% else %}
-                {% for field in order_by_fields_available %}
-                  <option value="{{ field.name }}"{% if ordering.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-                {% endfor %}
-              {% endif %}
+              {% for field in order_by_fields_available %}
+                <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>
@@ -104,6 +86,31 @@
           </div>
         </div>
       </div>
+      <div class="field-wrapper">
+        <div class="control">
+          <div class="label">
+            Paginate By
+          </div>
+          <div class="field">
+            <input name="paginate_by" value="{{ paginate_by }}">
+          </div>
+        </div>
+      </div>
+      <div class="field-wrapper">
+        <div class="control">
+          <div class="label">
+            Show Fields
+          </div>
+          <div class="field">
+            <select multiple="multiple" name="show_columns">
+              {% for field in showable_fields %}
+                <option value="{{ field.name }}"{% if field.name in show_columns %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
 
       <div class="field-wrapper">
         <div class="control">
@@ -220,6 +227,25 @@
 
     </div>
   </div>
+  <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+  </div>
+
+
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
