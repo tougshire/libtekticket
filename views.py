@@ -249,6 +249,7 @@ class TicketList(PermissionRequiredMixin, ListView):
             'short_description',
             'long_description',
             'resolution_notes',
+            'item__primary_id',
             'item__common_name',
             'item__mmodel__brand',
             'submitted_by__display_name',
