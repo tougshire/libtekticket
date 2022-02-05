@@ -46,7 +46,7 @@ class Ticket(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='The item to which this ticket applies - leave blank if not applicable you have trouble finding it'
+        help_text='The item to which this ticket applies - leave blank if not applicable or you have trouble finding it'
     )
     location = models.ForeignKey(
         Location,
@@ -68,6 +68,7 @@ class Ticket(models.Model):
     urgency = models.IntegerField(
         'Urgency',
         choices=URGENCY_CHOICES,
+        default=4,
         help_text='The urgency, on a scale of 1 to 5, where 1 is the most urgent'
     )
     submitted_by = models.ForeignKey(
@@ -100,6 +101,11 @@ class Ticket(models.Model):
         'resolution notes',
         blank=True,
         help_text='How the problem was resolved'
+    )
+    recipient_emails = models.TextField(
+        'recipient emails',
+        blank=True,
+        help_text='The comma-separated list of emails of those who should get updates on this ticket.  By default, emails are sent for changes in notes and resolution status'
     )
 
     def __str__(self):

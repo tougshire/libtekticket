@@ -1,23 +1,28 @@
-import json, sys
+import json
+import sys
+from urllib import request
 
 from django.apps import AppConfig
 from django.conf import settings
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import (PermissionRequiredMixin,
+                                        UserPassesTestMixin)
 from django.core.exceptions import FieldError, ObjectDoesNotExist
 from django.core.mail import send_mail
-from django.db.models.fields import EmailField
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
+from libtekin.models import Item, Location, Mmodel
 from tougshire_vistas.models import Vista
-from django.contrib.auth import get_user_model
-from .forms import TicketForm, TicketTicketNoteForm, TicketTicketNoteFormset
-from .models import Technician, History, Ticket, TicketNote
-from tougshire_vistas.views import make_vista, retrieve_vista, get_latest_vista, delete_vista, get_global_vista
+from tougshire_vistas.views import (delete_vista, get_global_vista,
+                                    get_latest_vista, make_vista,
+                                    retrieve_vista)
 
-from libtekin.models import Item, Mmodel, Location
+from .forms import TicketForm, TicketTicketNoteForm, TicketTicketNoteFormset
+from .models import History, Technician, Ticket, TicketNote
 
 
 def update_history(form, modelname, object, user):
@@ -48,6 +53,11 @@ def send_ticket_mail(ticket, request, is_new=False):
         is_new: If this mail is about the creation of a new ticket.  If not then it's an update
 
     """
+
+    # if it has no @ sign, assume no emails should be sent
+    if not ticket.recipient_emails.find('@') > 0:
+        return
+
     ticket_url = request.build_absolute_uri(
         reverse('libtekticket:ticket-detail', kwargs={'pk': ticket.pk}))
 
@@ -81,21 +91,25 @@ def send_ticket_mail(ticket, request, is_new=False):
     if ticket.ticketnote_set.all().exists:
         mail_html_message = mail_html_message + "<br>Notes:<br>\n" + "<br>\n".join([str(note.when) + ': ' + note.text + ' --' + str(note.submitted_by) for note in ticket.ticketnote_set.all()])
 
-    mail_recipients = [
-        tech.user.email for tech in Technician.objects.filter(is_current=True).filter(user__isnull=False)
-    ]
 
-    if ticket.submitted_by.email is not None:
-        mail_recipients.append(ticket.submitted_by.email)
+    mail_recipients = [email.strip() for email in ticket.recipient_emails.split(',')]
 
-    send_mail(
-        mail_subject,
-        mail_message,
-        mail_from,
-        mail_recipients,
-        html_message=mail_html_message,
-        fail_silently=False,
-    )
+    try:
+        send_mail(
+            mail_subject,
+            mail_message,
+            mail_from,
+            mail_recipients,
+            html_message=mail_html_message,
+            fail_silently=False,
+        )
+    except Exception as e:
+        messages.add_message(request, messages.WARNING, 'There was an error sending emails.')
+        messages.add_message(request, messages.WARNING, e)
+
+        print(e, ' at ', sys.exc_info()[2].tb_lineno)
+
+
 
 
 class TicketCreate(PermissionRequiredMixin, CreateView):
@@ -114,29 +128,37 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
 
         return context_data
 
+    def get_initial(self):
+        tech_emails = [tech.user.email for tech in Technician.objects.filter(is_current=True).filter(user__isnull=False)]
+        all_recipient_emails = ( tech_emails + [ self.request.user.email ] ) if self.request.user.email not in tech_emails else tech_emails
+        return {
+            'recipient_emails': ",\n".join(all_recipient_emails)
+        }
+
     def form_valid(self, form):
 
         response = super().form_valid(form)
 
         self.object = form.save(commit=False)
         self.object.submitted_by = self.request.user
+        if not 'recipient_emails' in self.request.POST:
+            self.object.recipient_emails = self.get_initial()['recipient_emails']
         self.object.save()
 
-        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
+        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object, initial=[
+            {
+                'submitted_by': self.request.user
+            }
+        ])
 
         if(ticketnotes).is_valid():
-            for form in ticketnotes.forms:
-                if form.has_changed():
-                    ticketnote = form.save(commit=False)
-                    if ticketnote.submitted_by is None:
-                        ticketnote.submitted_by = self.request.user
             ticketnotes.save()
         else:
-            for form in ticketnotes.forms:
-                print( form.errors )
             return self.form_invalid(form)
 
-        send_ticket_mail(self.object, self.request, is_new=True)
+
+        if not 'donot_send' in self.request.POST:
+            send_ticket_mail(self.object, self.request, is_new=True)
 
         return response
 
@@ -168,21 +190,18 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
 
         self.object = form.save()
 
-        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
+        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object, initial=[
+            {
+                'submitted_by': self.request.user
+            }
+        ])
 
         if(ticketnotes).is_valid():
-
-            # for form in ticketnotes.forms:
-            #     if form.has_changed():
-            #         ticketnote = form.save(commit=False)
-            #         if ticketnote.submitted_by is None:
-            #             ticketnote.submtted_by = self.request.user
-
             ticketnotes.save()
         else:
             return self.form_invalid(form)
 
-        if ticketnotes.has_changed():
+        if not 'donot_send' in self.request.POST:
             send_ticket_mail(self.object, self.request, is_new=False)
 
         return response

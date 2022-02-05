@@ -1,12 +1,24 @@
 {% load static %}
 {% load url_utils %}
+{% load shared_stuff %}
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-<title>Library Technical Inventory</title>
+<title>Library Technical Ticketing System</title>
+{% global_css_file as glocssfile %}
+{% if glocssfile %}
+  <link rel="stylesheet" href="{% static glocssfile %}">
+{% endif %}
 <link rel="stylesheet" href="{% static 'libtekticket/libtekticket.css' %}">
 </head>
 <body>
+  {% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% block menu %}
 {% include 'suvapuli/menu.html' %}
 {% endblock %}
