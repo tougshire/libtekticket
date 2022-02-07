@@ -143,6 +143,7 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
         self.object.submitted_by = self.request.user
         if not 'recipient_emails' in self.request.POST:
             self.object.recipient_emails = self.get_initial()['recipient_emails']
+
         self.object.save()
 
         ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object, initial=[

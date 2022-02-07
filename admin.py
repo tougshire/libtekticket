@@ -13,7 +13,8 @@ class TicketAdmin(admin.ModelAdmin):
         'when',
         'technician',
         'is_resolved',
-        'resolution_notes'
+        'resolution_notes',
+        'recipient_emails'
     )
 
 admin.site.register(Ticket, TicketAdmin)
