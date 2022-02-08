@@ -2,7 +2,10 @@
   <h2>{{ object }}</h2>
 
   <div class="detail">
-    {% include './_detail_field.html' with label=ticket_labels.item field=object.item %}
+    {% url 'libtekin:item-detail' object.item.pk as theurl %}
+    {% with item=object.item.common_name|add:' [<a href="'|add:theurl|add:'" target="_blank">view item</a>]'|safe %}
+      {% include './_detail_field.html' with label=ticket_labels.item field=item %}
+    {% endwith %}
     {% include './_detail_field.html' with label=ticket_labels.location field=object.location %}
     {% include './_detail_field.html' with label=ticket_labels.short_description field=object.short_description %}
     {% include './_detail_field.html' with label=ticket_labels.long_description field=object.long_description %}
