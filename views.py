@@ -109,9 +109,6 @@ def send_ticket_mail(ticket, request, is_new=False):
 
         print(e, ' at ', sys.exc_info()[2].tb_lineno)
 
-
-
-
 class TicketCreate(PermissionRequiredMixin, CreateView):
     permission_required = 'libtekticket.add_ticket'
     model = Ticket
@@ -124,7 +121,12 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
         if self.request.POST:
             context_data['ticketnotes'] = TicketTicketNoteFormset(self.request.POST)
         else:
-            context_data['ticketnotes'] = TicketTicketNoteFormset()
+            context_data['ticketnotes'] = TicketTicketNoteFormset(initial=[
+            {
+                'submitted_by': self.request.user
+            }
+        ])
+
 
         return context_data
 
@@ -146,13 +148,13 @@ class TicketCreate(PermissionRequiredMixin, CreateView):
 
         self.object.save()
 
-        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object, initial=[
-            {
-                'submitted_by': self.request.user
-            }
-        ])
+        ticketnotes = TicketTicketNoteFormset(self.request.POST, instance=self.object)
 
         if(ticketnotes).is_valid():
+            for form in ticketnotes.forms:
+                ticketnote = form.save(commit=False)
+                if ticketnote.submitted_by is None:
+                    ticketnote.submitted_by = self.request.user
             ticketnotes.save()
         else:
             return self.form_invalid(form)
@@ -180,7 +182,7 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
         if self.request.POST:
             context_data['ticketnotes'] = TicketTicketNoteFormset(self.request.POST, instance=self.object)
         else:
-            context_data['ticketnotes'] = TicketTicketNoteFormset(instance=self.object)
+            context_data['ticketnotes'] = TicketTicketNoteFormset(instance=self.object, initial=[{'submitted_by':self.request.user}])
 
         return context_data
 
@@ -198,6 +200,10 @@ class TicketUpdate(PermissionRequiredMixin, UpdateView):
         ])
 
         if(ticketnotes).is_valid():
+            for form in ticketnotes.forms:
+                ticketnote = form.save(commit=False)
+                if ticketnote.submitted_by is None:
+                    ticketnote.submitted_by = self.request.user
             ticketnotes.save()
         else:
             return self.form_invalid(form)
@@ -255,7 +261,6 @@ class TicketList(PermissionRequiredMixin, ListView):
     model = Ticket
     paginate_by = 30
 
-
     def setup(self, request, *args, **kwargs):
 
         self.vista_settings={
@@ -306,6 +311,8 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         self.vista_defaults = {
             'order_by': Item._meta.ordering,
+            'filterop__is_resolved':'exact',
+            'filterfield__is_resolved': 'False',
             'paginate_by':self.paginate_by
         }
 
@@ -347,6 +354,8 @@ class TicketList(PermissionRequiredMixin, ListView):
             self.vista_context[key] = vistaobj['context'][key]
 
         queryset = vistaobj['queryset']
+
+        print('tp m2eb22 ordered', queryset.ordered)
 
         return queryset
 

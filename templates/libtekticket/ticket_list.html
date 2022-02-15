@@ -1,172 +1,186 @@
 {% extends './_base.html' %}
 {% load static %}
 {% block content %}
-  <button type="button" id='btn_showviewform' class="show">Show Sort/Filter form</button>
-  <div id='div_viewform' class="viewform hidden" >
-    <form method="POST">
+  <button type="button" id='btn_showvista' class="show">Show Sort/Filter form</button>
+  <div id='div_vista' class="vista hidden" >
+    <form id="frm_vista" method="POST">
       {% csrf_token %}
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Sort By
-          </div>
-          <div class="field">
-            <select name="order_by">
-              {% for field in order_by_fields_available %}
-                <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
-            </select>
-            <select name="order_by">
-              {% for field in order_by_fields_available %}
-                <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
-            </select>
-            <select name="order_by">
-              {% for field in order_by_fields_available %}
-                <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
+        <div class="rowlabel">
+          Sort By
+        </div>
+        <div class="controlset">
+          <select name="order_by">
+            {% for field in order_by_fields_available %}
+              <option value="{{ field.name }}"{% if order_by.0 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+            {% endfor %}
+          </select>
+          <select name="order_by">
+            {% for field in order_by_fields_available %}
+              <option value="{{ field.name }}"{% if order_by.1 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+            {% endfor %}
+          </select>
+          <select name="order_by">
+            {% for field in order_by_fields_available %}
+              <option value="{{ field.name }}"{% if order_by.2 == field.name %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Quick Search
-          </div>
-          <div class="field">
-            <input id="ctl_combined_text_search" name="combined_text_search" value="{{ combined_text_search }}">
-          </div>
+        <div class="rowlabel">
+          Quick Search
+        </div>
+        <div class="controlset">
+          <input id="ctl_combined_text_search" name="combined_text_search" value="{{ combined_text_search }}">
         </div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Is Resolved
-          </div>
-          <div class="field">
-            <input type="hidden" name="filterop__is_resolved" value="exact">
+        <div class="rowlabel">
+          Is Resolved
+        </div>
+        <div class="controlset value">
+          <input type="hidden" name="filterop__is_resolved" value="exact">
+          <div class="control">
             <select name="filterfield__is_resolved">
               <option value="">--</option>
-              <option value="True"{% if filterfield__is_resolved %}{% if filterfield__is_resolved == "True" %} selected="SELECTED" {% endif %}{% endif %}>Yes</option>
-              <option value="False"{% if filterfield__is_resolved %}{% if filterfield__is_resolved == "False" %} selected="SELECTED" {% endif %}{% endif %}>No</option>
+              <option value="True"{% if filterfield__is_resolved %}{% if "True" in filterfield__is_resolved  %} selected="SELECTED" {% endif %}{% endif %}>Yes</option>
+              <option value="False"{% if filterfield__is_resolved %}{% if "False" in filterfield__is_resolved %} selected="SELECTED" {% endif %}{% endif %}>No</option>
             </select>
           </div>
         </div>
+        <div class="controlset null">&nbsp;x</div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Item is
-          </div>
-          <div class="field">
-            <input type="hidden" name="filterop__item" value="in">
+        <div class="rowlabel">
+          Item is
+        </div>
+        <div class="controlset value">
+          <input type="hidden" name="filterop__item" value="in">
+          <div class="control">
             <select multiple name="filterfield__item">
               {% for item in items %}
                 <option value="{{ item.pk }}"{% if filterfield__item %}{% if item.pk|lower in filterfield__item %} selected="SELECTED" {% endif %}{% endif %}>{{ item }}</option>
               {% endfor %}
             </select>
-            None:<input type="checkbox" name="filterop__item" value="isnull" {% if 'isnull' in filterop__item %}checked="CHECKED" {% endif %}>
+          </div>
+        </div>
+        <div class="controlset null">
+          <div class="label">
+            Has no item
+          </div>
+          <div class="control">
+            <input type="checkbox" name="filterop__item" value="isnull" {% if 'isnull' in filterop__item %}checked="CHECKED" {% endif %}>
           </div>
         </div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Submitter is
-          </div>
+        <div class="rowlabel">
+          Submitted by
+        </div>
+        <div class="controlset value">
           <input type="hidden" name="filterop__submitted_by" value="in">
-          <div class="field">
+          <div class="control">
             <select multiple id="ctrl__filtefield__submitted_by" name="filterfield__submitted_by" >
               {% for user in users %}
                 <option value="{{ user.pk }}"{% if filterfield__submitted_by %}{% if user.pk|lower in filterfield__submitted_by %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
               {% endfor %}
             </select>
-            <input type="checkbox" name="filter__mmodel__none">
+          </div>
+        </div>
+        <div class="controlset null">
+          <div class="label">
+            Has no Submitter
+          </div>
+          <div class="control">
+            <input type="checkbox" name="filterop__submitted_by" value="isnull" {% if 'isnull' in filterop__submitted_by %}checked="CHECKED" {% endif %}>
           </div>
         </div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
+        <div class="rowlabel">
             Paginate By
-          </div>
-          <div class="field">
-            <input name="paginate_by" value="{{ paginate_by }}">
-          </div>
+        </div>
+        <div class="controlset">
+          <input name="paginate_by" value="{{ paginate_by }}">
         </div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
+        <div class="rowlabel">
             Show Fields
-          </div>
-          <div class="field">
-            <select multiple="multiple" name="show_columns">
-              {% for field in showable_fields %}
-                <option value="{{ field.name }}"{% if field.name in show_columns %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
+        </div>
+        <div class="controlset">
+          <select multiple="multiple" name="show_columns">
+            {% for field in showable_fields %}
+              <option value="{{ field.name }}"{% if field.name in show_columns %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
 
 
       <div class="field-wrapper">
+        <div class="rowlabel">
+          Save Search As
+        </div>
         <div class="control">
-          <div class="label">
-            Save Search
-          </div>
-          <div class="field">
-            <input name="vista__name" value="">
-          </div>
+          <input name="vista__name" value="">
         </div>
       </div>
 
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            &nbsp;
-          </div>
-          <div class="field">
-            <button type="submit" name="vista_query_submitted" value='True'>Submit</button>
-          </div>
-        </div>
-        <div class="help_text">
+        <div class="rowlabel">
           &nbsp;
+        </div>
+        <div class="controlset">
+          <button type="submit" name="vista_query_submitted" value='True'>Submit</button>
+        </div>
+      </div>
+      <div class="help_text">
+        &nbsp;
+      </div>
+    </form>
+
+    <form method="POST">
+      {% csrf_token %}
+      <h3>Default View</h3>
+      <div class="field-wrapper">
+        <div class="rowlabel">
+          Get Default Search
+        </div>
+        <div class="controlset">
+          <button type="submit" name="vista_query_submitted" value='True'>Default</button>
         </div>
       </div>
     </form>
+
     <form method="POST">
       {% csrf_token %}
       <h3>Saved View</h3>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
+        <div class="rowlabel">
             Get Saved View
-          </div>
-          <div class="field">
-            <select name="vista__name">
-              <option value=''>-----</option>
-              {% for vista in vistas%}
-                <option value="{{ vista.name }}">{{ vista.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+        </div>
+        <div class="controlset">
+          <select name="vista__name">
+            <option value=''>-----</option>
+            {% for vista in vistas%}
+              <option value="{{ vista.name }}">{{ vista.name }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
       <div class="field-wrapper">
-        <div class="control">
-          <div class="label">
-            Action
-          </div>
-          <div class="field">
-            <button type="submit" name="get_vista" value="get">Get</button>
-            <button type="submit" name="delete_vista" value="delete">Delete</button>
-          </div>
+        <div class="rowlabel">
+          Action
+        </div>
+        <div class="field">
+          <button type="submit" name="get_vista" value="get">Get</button>
+          <button type="submit" name="delete_vista" value="delete">Delete</button>
         </div>
       </div>
     </form>
+
   </div>
 
   <div class="list">
@@ -230,8 +244,8 @@
   <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            <a id="a_first" href="?page=1">&laquo; first</a>
+            <a id="a_previous" href="?page={{ page_obj.previous_page_number }}">previous</a>
         {% endif %}
 
         <span class="current">
@@ -239,8 +253,8 @@
         </span>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            <a id="a_next" href="?page={{ page_obj.next_page_number }}">next</a>
+            <a id="a_last" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
   </div>
@@ -249,23 +263,35 @@
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
+  <script>
+
+  for( paginator of ['a_first', 'a_previous', 'a_next', 'a_last']) {
+    if(!(document.getElementById(paginator)==null) ) {
+      document.getElementById(paginator).addEventListener('click', function(e) {
+        e.preventDefault()
+        document.getElementById('frm_vista').action = e.target.href
+        document.getElementById('frm_vista').submit()
+      });
+    }
+  }
+  </script>
   <script src="{% static 'touglates/touglates.js' %}"></script>
   <script>
 
     function toggleSortFilterForm() {
-      btnShowviewform = document.getElementById('btn_showviewform')
-      var viewDiv = document.getElementById('div_viewform')
-      viewDiv.classList.toggle('hidden')
-      if( viewDiv.classList.contains('hidden')) {
-        btnShowviewform.textContent='Show Sort/Filter Form'
+      btnShowvista = document.getElementById('btn_showvista')
+      var vistaDiv = document.getElementById('div_vista')
+      vistaDiv.classList.toggle('hidden')
+      if( vistaDiv.classList.contains('hidden')) {
+        btnShowvista.textContent='Show Sort/Filter Form'
       } else {
         document.getElementById("ctl_combined_text_search").focus()
-        btnShowviewform.textContent='Hide Sort/Filter Form'
+        btnShowvista.textContent='Hide Sort/Filter Form'
       }
     }
   </script>
   <script>
-    document.getElementById('btn_showviewform').addEventListener('click', function(e){
+    document.getElementById('btn_showvista').addEventListener('click', function(e){
       e.preventDefault
       toggleSortFilterForm()
     });
