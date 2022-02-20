@@ -76,7 +76,7 @@
         </tr>
         {% for ticketnote in object.ticketnote_set.all %}
           <tr id="tr_ticketnote_{{ ticketnote.id }}">
-            <td>{{ ticketnote.when }}</td><td>{{ ticketnote.text }}</td><td>{{ ticketnote.is_major }}</td>
+            <td>{{ ticketnote.when }}</td><td>{{ ticketnote.text }}</td>
           </tr>
         {% endfor %}
       </table>
