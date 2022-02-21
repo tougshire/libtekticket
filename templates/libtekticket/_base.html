@@ -1,11 +1,12 @@
 {% load static %}
 {% load url_utils %}
-{% load shared_stuff %}
+{% load touglates_tags %}
+
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-<title>Library Technical Ticketing System</title>
-{% global_css_file as glocssfile %}
+<title>Library Technical Inventory</title>
+{% project_css_file as glocssfile %}
 {% if glocssfile %}
   <link rel="stylesheet" href="{% static glocssfile %}">
 {% endif %}
@@ -20,7 +21,10 @@
 </ul>
 {% endif %}
 {% block menu %}
-{% include 'suvapuli/menu.html' %}
+{% project_include_file as includefile %}
+{% if includefile %}
+  {% include includefile %}
+{% endif %}
 {% endblock %}
 {% block content %}{% endblock %}
 {% block bottomscript %}{% endblock %}
