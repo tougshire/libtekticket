@@ -1,16 +1,13 @@
 {% load static %}
 {% load url_utils %}
 {% load touglates_tags %}
-
 <!DOCTYPE html>
 <html lang='en'>
 <head>
 <title>Library Technical Inventory</title>
-{% project_css_file as glocssfile %}
-{% if glocssfile %}
-  <link rel="stylesheet" href="{% static glocssfile %}">
-{% endif %}
 <link rel="stylesheet" href="{% static 'libtekticket/libtekticket.css' %}">
+{% project_include_file 'main_css' as cssfile %}
+{% if cssfile %}<link rel="stylesheet" href="{% static cssfile %}">{% endif %}
 </head>
 <body>
   {% if messages %}
@@ -21,7 +18,7 @@
 </ul>
 {% endif %}
 {% block menu %}
-{% project_include_file as includefile %}
+{% project_include_file 'main_menu' as includefile %}
 {% if includefile %}
   {% include includefile %}
 {% endif %}
