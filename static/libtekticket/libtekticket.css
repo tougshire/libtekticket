@@ -1,40 +1,52 @@
-/* overall layout */
-
-/* layout of elements */
-
-.detail .control {
-    width:80%;
+.body, h1, h2 {
+    color:darkblue;
 }
-
-.detail .controlgroup {
-    width:100%;
-    display:flex;
-}
-
-.form .field {
-    width:80%;
-}
-
-.detail .field-wrapper {
-    margin-top:.5em;
-}
-
-.detail .label {
-    width:15%;
-}
-
-.detail .help_text {
-    margin-left:15%;
-}
-
 .hidden {
     display:none;
+}
+
+#div_homelogo {
+    margin: 5em auto;
+    text-align: center;
+}
+#img_homelogo {
+    text-align: center;
+    width:40%;
+}
+
+.menu-top, .app-menu {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 1px 1px;
+}
+.menu-bottom {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 1px 1px;
 }
 
 .form .formset {
     margin-left:2em;
 }
 
+.form .field-wrapper {
+    margin-top:.5em;
+}
+
+.control {
+    display:flex;
+}
+
+.form .label {
+    width:15%;
+    flex-grow:0;
+}
+
+.form .help_text {
+    margin-left:15%;
+}
 .list {
     width:100%;
     display:table;
@@ -52,76 +64,88 @@
     padding-left: .2em;
     padding-right: .2em;
 }
-
+.list .rowhead .field {
+    border:1px solid blue;
+}
 .list .field::after {
     content: "\00a0"
 }
 
-.list .rowhead .field {
-    border:1px solid blue;
+.vista .viewformset {
+    margin-left:2em;
 }
 
-.menu-bottom {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    padding: 1px 1px;
+.vista .field-wrapper {
+    margin-top:.5em;
 }
 
-.menu-top {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    padding: 1px 1px;
+.vista .control {
+    display:flex;
 }
+
+.vista .label {
+    width:15%;
+}
+
+.vista .help_text {
+    margin-left:15%;
+}
+
+.vista .viewformset {
+    margin-left:2em;
+}
+
+.vista .field-wrapper {
+    margin-top:.5em;
+}
+
+.vista .control {
+    display:flex;
+}
+.control .label {
+    flex-grow:0;
+    width:15%;
+}
+
+.viewform .label {
+    width:15%;
+}
+
+.viewform .help_text {
+    margin-left:15%;
+}
+
+.detail .detailset {
+    margin-left:2em;
+}
+
+.detail .field-wrapper {
+    margin-top:.5em;
+}
+
+.detail .control {
+    display:flex;
+}
+
+.detail .label {
+    width:15%;
+}
+
+.detail .help_text {
+    margin-left:15%;
+}
+
+
+
+
 
 .relatedset {
     margin-left:2em;
 }
 
-/* .vista {
-} */
-
-.vista .field-wrapper {
-    display:flex;
-    justify-content:flex-start space-between;
-    margin:1em 0 1em auto;
-}
-
-.vista .field-wrapper div {
-    flex: 0 0 auto;
-}
-
-.vista .null {
-    grid-column: 4 / span 1;
-}
-
-.vista .rowlabel {
-    width:10%;
-}
-
-.vista .value {
-    width:30%;
-    display:flex;
-}
-
-.vista .value .label {
-    width:20%;
-}
-
-input.len100, textarea.len100 {
-    width:100%;
-}
-
-input.len75, textarea.len75 {
-    width:75%;
-}
-input.len50, textarea.len50 {
-    width:50%;
-}
 
 
-/* Font, etc.. */
+/* Colors, Font, etc, */
 .menu a {
     text-decoration: none;
 }
@@ -130,6 +154,10 @@ input.len50, textarea.len50 {
 .menu {
     color: white;
     background-color:cornflowerblue;
+}
+
+.app-menu {
+    background-color:cadetblue
 }
 
 .menu a:link, .menu a:visited {
