@@ -71,48 +71,10 @@
     content: "\00a0"
 }
 
-.vista .viewformset {
-    margin-left:2em;
-}
 
-.vista .field-wrapper {
-    margin-top:.5em;
-}
-
-.vista .control {
-    display:flex;
-}
-
-.vista .label {
-    width:15%;
-}
-
-.vista .help_text {
-    margin-left:15%;
-}
-
-.vista .viewformset {
-    margin-left:2em;
-}
-
-.vista .field-wrapper {
-    margin-top:.5em;
-}
-
-.vista .control {
-    display:flex;
-}
 .control .label {
     flex-grow:0;
     width:15%;
-}
-
-.viewform .label {
-    width:15%;
-}
-
-.viewform .help_text {
-    margin-left:15%;
 }
 
 .detail .detailset {
@@ -164,3 +126,33 @@
     color:white;
 }
 
+.vista .control {
+    display:flex;
+}
+
+.vista .field-wrapper {
+    margin-top:.5em;
+    width:100%;
+    display:flex;
+}
+
+.vista .rowlabel {
+    width:15%;
+}
+
+.vista .controlset {
+    width:25%;
+    display:flex;
+}
+
+.vista .help_text {
+    margin-left:15%;
+}
+
+.vista .viewformset {
+    margin-left:2em;
+}
+
+.vista .control {
+    display:flex;
+}
