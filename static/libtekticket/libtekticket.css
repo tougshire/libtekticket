@@ -126,22 +126,30 @@
     color:white;
 }
 
+.vista {
+    display:grid;
+    grid-template-columns:1fr 2fr 1fr 1fr;
+}
+
 .vista .control {
     display:flex;
 }
 
-.vista .field-wrapper {
+/* .vista .field-wrapper {
     margin-top:.5em;
     width:100%;
     display:flex;
-}
+} */
 
 .vista .rowlabel {
-    width:15%;
+    /* width:15%; */
+    grid-row: auto;
+    grid-column: 1 / span 1
 }
 
 .vista .controlset {
-    width:25%;
+    grid-column: auto / span 1;
+    grid-row: auto;
     display:flex;
 }
 

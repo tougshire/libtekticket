@@ -2,8 +2,9 @@
 {% load static %}
 {% block content %}
   <button type="button" id='btn_showvista' class="show">Show Sort/Filter form</button>
-  <div id='div_vista' class="vista hidden" >
+  <div id='div_vista'>
     <form id="frm_vista" method="POST">
+      <div class="vista">
       {% csrf_token %}
       <div class="field-wrapper">
         <div class="rowlabel">
@@ -139,11 +140,13 @@
       <div class="help_text">
         &nbsp;
       </div>
+    </div>
     </form>
 
+    <h3>Default View</h3>
     <form method="POST">
+      <div class="vista">
       {% csrf_token %}
-      <h3>Default View</h3>
       <div class="field-wrapper">
         <div class="rowlabel">
           Get Default Search
@@ -152,11 +155,13 @@
           <button type="submit" name="vista_query_submitted" value='True'>Default</button>
         </div>
       </div>
+    </div>
     </form>
 
+    <h3>Saved View</h3>
     <form method="POST">
+      <div class="vista">
       {% csrf_token %}
-      <h3>Saved View</h3>
       <div class="field-wrapper">
         <div class="rowlabel">
             Get Saved View
@@ -179,6 +184,7 @@
           <button type="submit" name="delete_vista" value="delete">Delete</button>
         </div>
       </div>
+    </div>
     </form>
 
   </div>
