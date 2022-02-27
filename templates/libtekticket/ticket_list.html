@@ -275,44 +275,36 @@
     }
   }
   </script>
-  <script src="{% static 'touglates/touglates.js' %}"></script>
-  <script>
 
-    function toggleSortFilterForm() {
-      btnShowvista = document.getElementById('btn_showvista')
-      var vistaDiv = document.getElementById('div_vista')
-      vistaDiv.classList.toggle('hidden')
-      if( vistaDiv.classList.contains('hidden')) {
-        btnShowvista.textContent='Show Sort/Filter Form'
-      } else {
-        document.getElementById("ctl_combined_text_search").focus()
-        btnShowvista.textContent='Hide Sort/Filter Form'
-      }
-    }
+  <script>
+    addFilterInput("ctrl__filter__item__in")
   </script>
+  <script>
+    addFilterInput("ctrl__filter__item__in")
+  </script>
+
+
   <script>
     document.getElementById('btn_showvista').addEventListener('click', function(e){
       e.preventDefault
-      toggleSortFilterForm()
+      toggleVisibility(div_vista, 'btn_showvista')
     });
 
-  </script>
-  <script>
     document.addEventListener('keydown', function(e) {
       if(e.ctrlKey) {
         if(e.shiftKey) {
           if(e.which==70) {
             e.preventDefault();
-            toggleSortFilterForm()
+             toggleVisibility('div_vista', 'btn_showvista')
           }
         }
       }
     });
+    toggleVisibility('div_vista', 'btn_showvista', 0 )
+
   </script>
-  <script>
-    addFilterInput("ctrl__filter__item__in")
-  </script>
-  <script>
-    addFilterInput("ctrl__filter__item__in")
-  </script>
+
+
+
+
 {% endblock %}
