@@ -1,12 +1,11 @@
 {% extends './_base.html' %}
 {% load static %}
 {% block content %}
-  <button type="button" id='btn_showvista' class="show">Show Sort/Filter form</button>
+  <button type="button" id='btn_showvista' class="show" data-showtext="Show the Sort Filter Form" data-hidetext="Hide the Sort Filter Form">Show Sort/Filter form</button>
   <div id='div_vista'>
     <form id="frm_vista" method="POST">
       <div class="vista">
-      {% csrf_token %}
-      <div class="field-wrapper">
+        {% csrf_token %}
         <div class="rowlabel">
           Sort By
         </div>
@@ -27,16 +26,12 @@
             {% endfor %}
           </select>
         </div>
-      </div>
-      <div class="field-wrapper">
         <div class="rowlabel">
           Quick Search
         </div>
         <div class="controlset">
           <input id="ctl_combined_text_search" name="combined_text_search" value="{{ combined_text_search }}">
         </div>
-      </div>
-      <div class="field-wrapper">
         <div class="rowlabel">
           Is Resolved
         </div>
@@ -50,9 +45,7 @@
             </select>
           </div>
         </div>
-        <div class="controlset null">&nbsp;x</div>
-      </div>
-      <div class="field-wrapper">
+        <div class="controlset null">&nbsp;</div>
         <div class="rowlabel">
           Item is
         </div>
@@ -74,8 +67,6 @@
             <input type="checkbox" name="filterop__item" value="isnull" {% if 'isnull' in filterop__item %}checked="CHECKED" {% endif %}>
           </div>
         </div>
-      </div>
-      <div class="field-wrapper">
         <div class="rowlabel">
           Submitted by
         </div>
@@ -97,16 +88,12 @@
             <input type="checkbox" name="filterop__submitted_by" value="isnull" {% if 'isnull' in filterop__submitted_by %}checked="CHECKED" {% endif %}>
           </div>
         </div>
-      </div>
-      <div class="field-wrapper">
         <div class="rowlabel">
             Paginate By
         </div>
         <div class="controlset">
           <input name="paginate_by" value="{{ paginate_by }}">
         </div>
-      </div>
-      <div class="field-wrapper">
         <div class="rowlabel">
             Show Fields
         </div>
@@ -117,37 +104,31 @@
             {% endfor %}
           </select>
         </div>
-      </div>
 
-
-      <div class="field-wrapper">
         <div class="rowlabel">
           Save Search As
         </div>
-        <div class="control">
-          <input name="vista__name" value="">
+        <div class="controlset">
+          <div class="control">
+            <input name="vista__name" value="">
+          </div>
         </div>
-      </div>
-
-      <div class="field-wrapper">
         <div class="rowlabel">
           &nbsp;
         </div>
         <div class="controlset">
           <button type="submit" name="vista_query_submitted" value='True'>Submit</button>
         </div>
+        <div class="help_text">
+          &nbsp;
+        </div>
       </div>
-      <div class="help_text">
-        &nbsp;
-      </div>
-    </div>
     </form>
 
     <h3>Default View</h3>
     <form method="POST">
       <div class="vista">
       {% csrf_token %}
-      <div class="field-wrapper">
         <div class="rowlabel">
           Get Default Search
         </div>
@@ -155,14 +136,12 @@
           <button type="submit" name="vista_query_submitted" value='True'>Default</button>
         </div>
       </div>
-    </div>
     </form>
 
     <h3>Saved View</h3>
     <form method="POST">
       <div class="vista">
       {% csrf_token %}
-      <div class="field-wrapper">
         <div class="rowlabel">
             Get Saved View
         </div>
@@ -174,8 +153,6 @@
             {% endfor %}
           </select>
         </div>
-      </div>
-      <div class="field-wrapper">
         <div class="rowlabel">
           Action
         </div>
@@ -184,7 +161,6 @@
           <button type="submit" name="delete_vista" value="delete">Delete</button>
         </div>
       </div>
-    </div>
     </form>
 
   </div>
@@ -301,7 +277,7 @@
         if(e.shiftKey) {
           if(e.which==70) {
             e.preventDefault();
-             toggleVisibility('div_vista', 'btn_showvista')
+            toggleVisibility('div_vista', 'btn_showvista')
           }
         }
       }
