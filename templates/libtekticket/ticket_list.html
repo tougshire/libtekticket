@@ -32,108 +32,163 @@
         <div class="controlset">
           <input id="ctl_combined_text_search" name="combined_text_search" value="{{ combined_text_search }}">
         </div>
-        <div class="rowlabel">
-          Is Resolved
-        </div>
-        <div class="controlset value">
-          <input type="hidden" name="filterop__is_resolved" value="exact">
-          <div class="control">
-            <select name="filterfield__is_resolved">
-              <option value="">--</option>
-              <option value="True"{% if filterfield__is_resolved %}{% if "True" in filterfield__is_resolved  %} selected="SELECTED" {% endif %}{% endif %}>Yes</option>
-              <option value="False"{% if filterfield__is_resolved %}{% if "False" in filterfield__is_resolved %} selected="SELECTED" {% endif %}{% endif %}>No</option>
+      </div>
+      <script>
+        var qty_searches = 5
+      </script>
+      {% for filterset in filter %}
+        <div id="div_fieldsearch__{{ forloop.counter0 }}" class="vista fieldsearch">
+          <div class="rowlabel">
+            Field Search
+          </div>
+          <div class="controlset filterselectfield">
+            <select id="ctl_filter__field__{{ forloop.counter0 }}" name="filter__fieldname__{{ forloop.counter0 }}" autocomplete="off">
+              <option value="">---</option>
+              <option value='is_resolved'{% if filterset.fieldname == 'is_resolved' %} selected="SELECTED"{% endif %}>{{ ticket_labels.is_resolved }}</option>
+              <option value='item'{% if filterset.fieldname == 'item' %} selected="SELECTED"{% endif %}>{{ ticket_labels.item }}</option>
+              <option value='item__mmodel'{% if filterset.fieldname == 'item__mmodel' %} selected="SELECTED"{% endif %}>Model</option>
+              <option value='submitted_by'{% if filterset.fieldname == 'submitted_by' %} selected="SELECTED"{% endif %}>{{ ticket_labels.submitted_by }}</option>
             </select>
           </div>
-        </div>
-        <div class="controlset null">&nbsp;</div>
-        <div class="rowlabel">
-          Item is
-        </div>
-        <div class="controlset value">
-          <input type="hidden" name="filterop__item" value="in">
-          <div class="control">
-            <select multiple name="filterfield__item">
+          <div id="div_filter__is_resolved__{{ forloop.counter0 }}" class="controlset filter__value" style="display:none">
+            <input type="hidden" id="ctl_filter__op__is_resolved__{{ forloop.counter0 }}" value="exact">
+            <input type="checkbox" id="ctl_filter__value__is_resolved__{{ forloop.counter0 }}" {% if filterset.value %}checked="CHECKED"{% endif %}>
+          </div>
+          <div id="div_filter__item__{{ forloop.counter0 }}" class="controlset filter__value" style="display:none">
+            <input type="hidden" id="ctl_filter__op__item__{{ forloop.counter0 }}" value="in">
+            <select id="ctl_filter__value__item__{{ forloop.counter0 }}" multiple="MULTIPLE">
+              <option value="" >-----</option>
               {% for item in items %}
-                <option value="{{ item.pk }}"{% if filterfield__item %}{% if item.pk|lower in filterfield__item %} selected="SELECTED" {% endif %}{% endif %}>{{ item }}</option>
+                <option value="{{ item.pk }}"{% if item.pk|lower in filterset.value %} selected="SELECTED"{% endif %}>{{ item }}</option>
               {% endfor %}
             </select>
           </div>
-        </div>
-        <div class="controlset null">
-          <div class="label">
-            Has no item
+          <div id="div_filter__item__mmodel__{{ forloop.counter0 }}" class="controlset filter__value" style="display:none">
+            <input type="hidden" id="ctl_filter__op__item__mmodel__{{ forloop.counter0 }}" value="in">
+            <select id="ctl_filter__value__item__mmodel__{{ forloop.counter0 }}" multiple="MULTIPLE">
+              <option value="" >-----</option>
+              {% for mmodel in mmodels %}
+                <option value="{{ mmodel.pk }}"{% if mmodel.pk|lower in filterset.value %} selected="SELECTED"{% endif %}>{{ mmodel }}</option>
+              {% endfor %}
+            </select>
           </div>
-          <div class="control">
-            <input type="checkbox" name="filterop__item" value="isnull" {% if 'isnull' in filterop__item %}checked="CHECKED" {% endif %}>
+          <div id="div_filter__submitted_by__{{ forloop.counter0 }}" class="controlset filter__value" style="display:none">
+            <input type="hidden" id="ctl_filter__op__submitted_by__{{ forloop.counter0 }}" value="in">
+            <select id="ctl_filter__value__submitted_by__{{ forloop.counter0 }}" multiple="MULTIPLE">
+              <option value="" >-----</option>
+              <option value='[null]'>[No User]</option>
+              {% for user in users %}
+                <option value="{{ user.pk }}"{% if user.pk|lower in filterset.value %} selected="SELECTED"{% endif %}>{{ user }}</option>
+              {% endfor %}
+            </select>
           </div>
+          <div id="div_filter__when__{{ forloop.counter0 }}" class="controlset filter__value" style="display:none">
+            <input type="hidden" id="ctl_filter__op__when__{{ forloop.counter0 }}" value="range">
+            <input type="date" id="ctl_filter__value__when__{{ forloop.counter0 }}" data-siblings="1" value="{{ filterset.value.0 }}">
+            <input type="date" id="ctl_filter__value__when__{{ forloop.counter0 }}__0" value="{{ filterset.value.1 }}">
+          </div>
+
         </div>
+      {% endfor %}
+
+      <div class="vista">
         <div class="rowlabel">
-          Submitted by
+          Paginate By
         </div>
         <div class="controlset value">
-          <input type="hidden" name="filterop__submitted_by" value="in">
-          <div class="control">
-            <select multiple id="ctrl__filtefield__submitted_by" name="filterfield__submitted_by" >
-              {% for user in users %}
-                <option value="{{ user.pk }}"{% if filterfield__submitted_by %}{% if user.pk|lower in filterfield__submitted_by %} selected="SELECTED" {% endif %}{% endif %}>{{ user }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-        <div class="controlset null">
-          <div class="label">
-            Has no Submitter
-          </div>
-          <div class="control">
-            <input type="checkbox" name="filterop__submitted_by" value="isnull" {% if 'isnull' in filterop__submitted_by %}checked="CHECKED" {% endif %}>
-          </div>
-        </div>
-        <div class="rowlabel">
-            Paginate By
-        </div>
-        <div class="controlset">
           <input name="paginate_by" value="{{ paginate_by }}">
         </div>
+
         <div class="rowlabel">
-            Show Fields
+          Show Fields
         </div>
-        <div class="controlset">
+        <div class="controlset value">
           <select multiple="multiple" name="show_columns">
             {% for field in showable_fields %}
               <option value="{{ field.name }}"{% if field.name in show_columns %} selected="SELECTED" {% endif %}>{{ field.label }}</option>
             {% endfor %}
           </select>
         </div>
+      </div>
 
+      <div class="vista">
         <div class="rowlabel">
-          Save Search As
+          Save Search
         </div>
         <div class="controlset">
-          <div class="control">
-            <input name="vista__name" value="">
-          </div>
+          <input name="vista_name" value="">
+        </div>
+        <div class="controlset">
+          <input type="checkbox" name="make_default" value="">
         </div>
         <div class="rowlabel">
           &nbsp;
         </div>
         <div class="controlset">
-          <button type="submit" name="vista_query_submitted" value='True'>Submit</button>
+          <button type="submit" name="vista_query_submitted" value='True'>Search</button>
         </div>
         <div class="help_text">
           &nbsp;
         </div>
       </div>
     </form>
+    <script>
+
+      function showFilterField(select) {
+        let ctlNum = select.id.substring(19)
+        let val_control
+        for(opt of select.options) {
+          if(opt.value){
+            document.getElementById('div_filter__' + opt.value + '__' + ctlNum ).style.display="none"
+            document.getElementById('ctl_filter__op__' + opt.value + '__' + ctlNum ).removeAttribute('name')
+            val_control = document.getElementById('ctl_filter__value__' + opt.value + '__' + ctlNum )
+            val_control.removeAttribute('name')
+            if( val_control.dataset.siblings ) {
+              for(i=0; i < (val_control.dataset.siblings); i++) {
+                document.getElementById('ctl_filter__value__' + opt.value + '__' + ctlNum + '__' + i ).removeAttribute('name')
+              }
+            }
+          }
+        }
+        if(select.value) {
+          select.classList.remove('grayedout')
+          select.name="filter__fieldname__" + ctlNum
+          document.getElementById('div_filter__' + select.value  + '__' + ctlNum ).style.display="block"
+          document.getElementById('ctl_filter__op__' + select.value + '__' + ctlNum ).name="filter__op__" + ctlNum
+          val_control = document.getElementById('ctl_filter__value__' + select.value + '__' + ctlNum )
+          val_control.name="filter__value__" + ctlNum
+          if( val_control.dataset.siblings ) {
+            for(i=0; i < (val_control.dataset.siblings); i++) {
+              document.getElementById('ctl_filter__value__' + select.value + '__' + ctlNum + '__' + i ).name="filter__value__" + ctlNum
+            }
+          }
+        } else {
+          select.removeAttribute("name")
+        }
+      }
+      for( ctlNum = 0; ctlNum < qty_searches; ctlNum++ ) {
+        document.getElementById('ctl_filter__field__' + ctlNum).addEventListener('change', function(e) {
+          showFilterField(e.target)
+        })
+        showFilterField(document.getElementById('ctl_filter__field__' + ctlNum))
+        if( ctlNum < qty_searches - 1) {
+            let localCtlNum = ctlNum
+          document.getElementById('div_fieldsearch__' + ctlNum).addEventListener('click', function() {
+            document.getElementById('div_fieldsearch__' + ( localCtlNum + 1 )).style.removeProperty('display')
+          })
+        }
+      }
+    </script>
 
     <h3>Default View</h3>
     <form method="POST">
       <div class="vista">
-      {% csrf_token %}
+        {% csrf_token %}
         <div class="rowlabel">
-          Get Default Search
+          Get Default
         </div>
         <div class="controlset">
-          <button type="submit" name="vista_query_submitted" value='True'>Default</button>
+          <button type="submit" name="default_vista" value='True'>Default</button>
         </div>
       </div>
     </form>
@@ -141,12 +196,12 @@
     <h3>Saved View</h3>
     <form method="POST">
       <div class="vista">
-      {% csrf_token %}
+        {% csrf_token %}
         <div class="rowlabel">
-            Get Saved View
+          Get Saved View
         </div>
         <div class="controlset">
-          <select name="vista__name">
+          <select name="vista_name">
             <option value=''>-----</option>
             {% for vista in vistas%}
               <option value="{{ vista.name }}">{{ vista.name }}</option>
@@ -156,13 +211,12 @@
         <div class="rowlabel">
           Action
         </div>
-        <div class="field">
-          <button type="submit" name="get_vista" value="get">Get</button>
+        <div class="controlset">
+          <button type="submit" name="retrieve_vista" value="retrieve_vista">Get</button>
           <button type="submit" name="delete_vista" value="delete">Delete</button>
         </div>
       </div>
     </form>
-
   </div>
 
   <div class="list">
