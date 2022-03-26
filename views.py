@@ -1,5 +1,6 @@
 import sys
 import urllib
+from urllib.parse import urlencode
 
 from django.apps import AppConfig
 from django.conf import settings
@@ -263,12 +264,42 @@ class TicketList(PermissionRequiredMixin, ListView):
 
     def setup(self, request, *args, **kwargs):
 
+        self.field_labels = {
+            'is_resolved':'Is Resolved',
+            'item__common_name': 'Common Name',
+            'item__mmodel__brand': "Brand",
+            'item__primary_id': 'Primary Id',
+            'item': 'Item',
+            'location': 'Location',
+            'long_description': 'Long Description',
+            'resolution_notes': 'Resolution Notes',
+            'short_description': 'Short Description',
+            'submitted_by__display_name': 'Submitted By',
+            'submitted_by': 'Submitted By',
+            'urgency': 'Urgency',
+            'when': 'When Submitted',
+        }
         self.vista_settings={
             'max_search_keys':5,
             'text_fields_available':[],
             'filter_fields_available':{},
             'order_by_fields_available':[],
             'columns_available':[]
+        }
+
+        self.vista_settings['field_types'] = {
+            'is_resolved':'boolean',
+            'item__common_name': 'char',
+            'item__mmodel__brand': 'char',
+            'item__primary_id': 'char',
+            'item': 'model',
+            'location': 'model',
+            'long_description': 'char',
+            'resolution_notes': 'char',
+            'short_description': 'char',
+            'submitted_by__display_name': 'model',
+            'urgency': 'list',
+            'when':'date',
         }
 
         self.vista_settings['text_fields_available']=[
@@ -310,19 +341,13 @@ class TicketList(PermissionRequiredMixin, ListView):
         ]:
             self.vista_settings['columns_available'].append(fieldname)
 
-
-        self.vista_settings['field_types'] = {
-            'when':'date',
-            'is_resolved':'boolean'
-        }
-
-        self.vista_defaults = {
-            'order_by': Item._meta.ordering,
-            'paginate_by':self.paginate_by,
-            'filter__fieldname__0': 'is_resolved',
-            'filter__op__0': 'exact',
-            'filter__value__0': 'False'
-        }
+        self.vista_defaults = QueryDict(urlencode([
+            ('order_by', Ticket._meta.ordering),
+            ('paginate_by', self.paginate_by),
+            ('filter__fieldname__0', 'is_resolved'),
+            ('filter__op__0', 'exact'),
+            ('filter__value__0', False)
+        ], doseq=True))
 
         return super().setup(request, *args, **kwargs)
 
@@ -338,7 +363,20 @@ class TicketList(PermissionRequiredMixin, ListView):
         if 'delete_vista' in self.request.POST:
             delete_vista(self.request)
 
-        if 'vista_query_submitted' in self.request.POST:
+        if 'query' in self.request.session:
+            querydict = QueryDict(self.request.session.get('query'))
+            self.vistaobj = make_vista(
+                self.request.user,
+                queryset,
+                querydict,
+                '',
+                False,
+                self.vista_settings
+            )
+            del self.request.session['query']
+
+        elif 'vista_query_submitted' in self.request.POST:
+
             self.vistaobj = make_vista(
                 self.request.user,
                 queryset,
@@ -356,16 +394,13 @@ class TicketList(PermissionRequiredMixin, ListView):
                 self.vista_settings
 
             )
-        elif 'default_vista' in self.request.POST:
-            print('tp m38830', urllib.parse.urlencode(self.vista_defaults))
+        else:
             self.vistaobj = default_vista(
                 self.request.user,
                 queryset,
-                QueryDict(urllib.parse.urlencode(self.vista_defaults)),
+                self.vista_defaults,
                 self.vista_settings
-
             )
-
 
         return self.vistaobj['queryset']
 
@@ -380,29 +415,34 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         context_data = super().get_context_data(**kwargs)
 
-        context_data['items'] = Item.objects.filter(ticket__gt=0)
-        context_data['mmodels'] = Mmodel.objects.all()
-        context_data['users'] = get_user_model().objects.all()
-        context_data['locations'] = Location.objects.all()
-        context_data['users'] = get_user_model().objects.all()
 
         context_data['order_by_fields_available'] = []
         for fieldname in self.vista_settings['order_by_fields_available']:
             if fieldname > '' and fieldname[0] == '-':
-                context_data['order_by_fields_available'].append({ 'name':fieldname, 'label':Ticket._meta.get_field(fieldname[1:]).verbose_name.title() + ' [Reverse]'})
+                context_data['order_by_fields_available'].append({ 'name':fieldname[1:], 'label':self.field_labels[fieldname[1:]] + ' [Reverse]'})
             else:
-                context_data['order_by_fields_available'].append({ 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title()})
+                context_data['order_by_fields_available'].append({ 'name':fieldname, 'label':self.field_labels[fieldname]})
 
-        context_data['columns_available'] = [{ 'name':fieldname, 'label':Ticket._meta.get_field(fieldname).verbose_name.title() } for fieldname in self.vista_settings['columns_available']]
+        context_data['columns_available'] = [{ 'name':fieldname, 'label':self.field_labels[fieldname] } for fieldname in self.vista_settings['columns_available']]
 
-        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekticket.ticket').all()
+        options={
+            'item': {'type':'model', 'values':Item.objects.all() },
+            'mmodel': {'type':'model', 'values':Mmodel.objects.all() },
+            'user': {'type':'model', 'values':get_user_model().objects.all() },
+            'location': {'type':'model', 'values':Location.objects.all() },
+            'is_resolved':{'type':'boolean'}
+        }
+
+        context_data['filter_fields_available'] = [{ 'name':fieldname, 'label':self.field_labels[fieldname], 'options':options[fieldname] if fieldname in options else '' } for fieldname in self.vista_settings['filter_fields_available']]
+
+        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='sdcpeople.person').all() # for choosing saved vistas
 
         if self.request.POST.get('vista_name'):
             context_data['vista_name'] = self.request.POST.get('vista_name')
 
         vista_querydict = self.vistaobj['querydict']
 
-        #putting the index before item name to make it easier for the template to iterate
+        #putting the index before person name to make it easier for the template to iterate
         context_data['filter'] = []
         for indx in range( self.vista_settings['max_search_keys']):
             cdfilter = {}
@@ -417,7 +457,7 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         context_data['combined_text_search'] = vista_querydict.get('combined_text_search') if 'combined_text_search' in vista_querydict else ''
 
-        context_data['ticket_labels'] = { field.name: field.verbose_name.title() for field in Ticket._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
+        context_data['item_labels'] = { field.name: field.verbose_name.title() for field in Item._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
 
         return context_data
 
