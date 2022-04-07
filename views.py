@@ -264,92 +264,162 @@ class TicketList(PermissionRequiredMixin, ListView):
 
     def setup(self, request, *args, **kwargs):
 
-        self.field_labels = {
-            'is_resolved':'Is Resolved',
-            'item__common_name': 'Common Name',
-            'item__mmodel__brand': "Brand",
-            'item__primary_id': 'Primary Id',
-            'item': 'Item',
-            'location': 'Location',
-            'long_description': 'Long Description',
-            'resolution_notes': 'Resolution Notes',
-            'short_description': 'Short Description',
-            'submitted_by__display_name': 'Submitted By',
-            'submitted_by': 'Submitted By',
-            'urgency': 'Urgency',
-            'when': 'When Submitted',
-        }
         self.vista_settings={
-            'max_search_keys':5,
+            'max_search_keys':5 ,
             'text_fields_available':[],
             'filter_fields_available':{},
             'order_by_fields_available':[],
-            'columns_available':[]
+            'columns_available':[],
         }
 
-        self.vista_settings['field_types'] = {
-            'is_resolved':'boolean',
-            'item__common_name': 'char',
-            'item__mmodel__brand': 'char',
-            'item__primary_id': 'char',
-            'item': 'model',
-            'location': 'model',
-            'long_description': 'char',
-            'resolution_notes': 'char',
-            'short_description': 'char',
-            'submitted_by__display_name': 'model',
-            'urgency': 'list',
-            'when':'date',
+        vista_fields = {
+            'item': {
+                'label':'Item',
+                'type':'model',
+                'available_to': [
+                    'fieldsearch',
+                    'order_by',
+                    'columns'
+                ]
+            },
+            'item__common_name': {
+                'label':'Item Name',
+                'type':'char',
+                'available_to': [
+                    'quicksearch',
+                ]
+            },
+            'location': {
+                'label':'Location',
+                'type':'model',
+                'available_to': [
+                    'fieldsearch',
+                    'order_by',
+                    'columns'
+                ]
+            },
+            'location__short_name': {
+                'label':'Location Short Name',
+                'type':'char',
+                'available_to': [
+                    'quicksearch',
+                ]
+            },
+            'location__full_name': {
+                'label':'Location Full Name',
+                'type':'char',
+                'available_to': [
+                    'quicksearch',
+                ]
+            },
+            'short_description': {
+                'label':'Title',
+                'type':'char',
+                'available_to':[
+                    'quicksearch',
+                    'fieldsearch',
+                    'columns',
+                ]
+            },
+            'long_description': {
+                'label':'Description',
+                'type':'char',
+                'available_to':[
+                    'quicksearch',
+                    'fieldsearch',
+                ]
+            },
+            'urgency': {
+                'label':'Urgency',
+                'type':'choice',
+                'source':Ticket.URGENCY_CHOICES,
+                'available_to':[
+                    'fieldsearch',
+                    'order_by',
+                    'columns',
+                ]
+            },
+            'submitted_by': {
+                'label':'Submitter',
+                'type':'model',
+                'source':get_user_model().objects.all(),
+                'available_to':[
+                    'fieldsearch',
+                    'order_by',
+                    'columns'
+                ]
+            },
+            'when': {
+                'label':'Date Submitted',
+                'type':'Date',
+                'available_to':[
+                    'fieldsearch',
+                    'order_by',
+                    'columns'
+                ]
+            },
+            'technician': {
+                'label':'Technician',
+                'type':'model',
+                'source':Technician.objects.all(),
+                'available_to':[
+                    'fieldsearch',
+                    'order_by',
+                    'columns',
+                ]
+            },
+            'is_resolved': {
+                'label':'Is Resolved',
+                'type':'boolean',
+                'available_to':[
+                    'fieldsearch',
+                    'order_by',
+                    'columns'
+                ]
+            },
+            'resolution_notes': {
+                'label':'Resolution Notes',
+                'type':'char',
+                'availale_to':[
+                    'quicksearch',
+                    'fieldsearch',
+                    'columns',
+                ]
+            },
+            'ticketnote__text': {
+                'label':'Note Text',
+                'type':'char',
+                'available_to':[
+                    'quicksearch'
+                ]
+            }
         }
 
-        self.vista_settings['text_fields_available']=[
-            'short_description',
-            'long_description',
-            'resolution_notes',
-            'item__primary_id',
-            'item__common_name',
-            'item__mmodel__brand',
-            'submitted_by__display_name',
-        ]
+        self.field_labels =  {  key:value['label']  for ( key, value ) in vista_fields.items() if 'label' in value  }
 
-        self.vista_settings['filter_fields_available'] = [
-            'item',
-            'location',
-            'urgency',
-            'submitted_by',
-            'is_resolved',
-            'when'
-        ]
+        self.vista_settings['field_types'] =  {  key:value['type']  for ( key, value ) in vista_fields.items() if 'type' in value  }
 
-        for fieldname in [
-            'is_resolved',
-            'urgency',
-            'when',
-            'submitted_by',
-            'item',
-        ]:
-            self.vista_settings['order_by_fields_available'].append(fieldname)
-            self.vista_settings['order_by_fields_available'].append('-' + fieldname)
+        self.vista_settings['text_fields_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'quicksearch' in value['available_to']  }
 
-        for fieldname in [
-            'is_resolved',
-            'urgency',
-            'when',
-            'submitted_by',
-            'item',
-            'short_description',
-        ]:
-            self.vista_settings['columns_available'].append(fieldname)
+        self.vista_settings['filter_fields_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'fieldsearch' in value['available_to']  }
+
+        self.vista_settings['order_by_fields_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'order_by' in value['available_to']  }
+
+        self.vista_settings['order_by_fields_available'] = self.vista_settings['order_by_fields_available'] + {  '-' + key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'order_by' in value['available_to']  }
+
+        self.vista_settings['columns_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'columns' in value['available_to']  }
+
 
         self.vista_defaults = QueryDict(urlencode([
-            ('order_by', Ticket._meta.ordering),
-            ('paginate_by', self.paginate_by),
-            ('filter__fieldname__0', 'is_resolved'),
-            ('filter__op__0', 'exact'),
-            ('filter__value__0', False)
-        ], doseq=True))
+            ('filter__fieldname', ['status']),
+            ('filter__op', ['in']),
+            ('filter__value', [1]),
+            ('order_by', ['priority', 'begin']),
+            ('paginate_by',self.paginate_by),
+        ],doseq=True) )
 
         return super().setup(request, *args, **kwargs)
+
 
     def post(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -414,7 +484,6 @@ class TicketList(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
 
         context_data = super().get_context_data(**kwargs)
-
 
         context_data['order_by_fields_available'] = []
         for fieldname in self.vista_settings['order_by_fields_available']:
