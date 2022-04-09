@@ -20,7 +20,7 @@ from libtekin.models import Item, Location, Mmodel
 from tougshire_vistas.models import Vista
 from tougshire_vistas.views import (delete_vista, get_global_vista,
                                     get_latest_vista, make_vista,
-                                    retrieve_vista, default_vista)
+                                    retrieve_vista, default_vista, vista_fields)
 
 from .forms import TicketForm, TicketTicketNoteForm, TicketTicketNoteFormset
 from .models import History, Technician, Ticket, TicketNote
@@ -263,152 +263,12 @@ class TicketList(PermissionRequiredMixin, ListView):
     paginate_by = 30
 
     def setup(self, request, *args, **kwargs):
-
         self.vista_settings={
-            'max_search_keys':5 ,
-            'text_fields_available':[],
-            'filter_fields_available':{},
-            'order_by_fields_available':[],
-            'columns_available':[],
+            'max_search_keys':10,
+            'fields':[],
         }
 
-        vista_fields = {
-            'item': {
-                'label':'Item',
-                'type':'model',
-                'available_to': [
-                    'fieldsearch',
-                    'order_by',
-                    'columns'
-                ]
-            },
-            'item__common_name': {
-                'label':'Item Name',
-                'type':'char',
-                'available_to': [
-                    'quicksearch',
-                ]
-            },
-            'location': {
-                'label':'Location',
-                'type':'model',
-                'available_to': [
-                    'fieldsearch',
-                    'order_by',
-                    'columns'
-                ]
-            },
-            'location__short_name': {
-                'label':'Location Short Name',
-                'type':'char',
-                'available_to': [
-                    'quicksearch',
-                ]
-            },
-            'location__full_name': {
-                'label':'Location Full Name',
-                'type':'char',
-                'available_to': [
-                    'quicksearch',
-                ]
-            },
-            'short_description': {
-                'label':'Title',
-                'type':'char',
-                'available_to':[
-                    'quicksearch',
-                    'fieldsearch',
-                    'columns',
-                ]
-            },
-            'long_description': {
-                'label':'Description',
-                'type':'char',
-                'available_to':[
-                    'quicksearch',
-                    'fieldsearch',
-                ]
-            },
-            'urgency': {
-                'label':'Urgency',
-                'type':'choice',
-                'source':Ticket.URGENCY_CHOICES,
-                'available_to':[
-                    'fieldsearch',
-                    'order_by',
-                    'columns',
-                ]
-            },
-            'submitted_by': {
-                'label':'Submitter',
-                'type':'model',
-                'source':get_user_model().objects.all(),
-                'available_to':[
-                    'fieldsearch',
-                    'order_by',
-                    'columns'
-                ]
-            },
-            'when': {
-                'label':'Date Submitted',
-                'type':'Date',
-                'available_to':[
-                    'fieldsearch',
-                    'order_by',
-                    'columns'
-                ]
-            },
-            'technician': {
-                'label':'Technician',
-                'type':'model',
-                'source':Technician.objects.all(),
-                'available_to':[
-                    'fieldsearch',
-                    'order_by',
-                    'columns',
-                ]
-            },
-            'is_resolved': {
-                'label':'Is Resolved',
-                'type':'boolean',
-                'available_to':[
-                    'fieldsearch',
-                    'order_by',
-                    'columns'
-                ]
-            },
-            'resolution_notes': {
-                'label':'Resolution Notes',
-                'type':'char',
-                'availale_to':[
-                    'quicksearch',
-                    'fieldsearch',
-                    'columns',
-                ]
-            },
-            'ticketnote__text': {
-                'label':'Note Text',
-                'type':'char',
-                'available_to':[
-                    'quicksearch'
-                ]
-            }
-        }
-
-        self.field_labels =  {  key:value['label']  for ( key, value ) in vista_fields.items() if 'label' in value  }
-
-        self.vista_settings['field_types'] =  {  key:value['type']  for ( key, value ) in vista_fields.items() if 'type' in value  }
-
-        self.vista_settings['text_fields_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'quicksearch' in value['available_to']  }
-
-        self.vista_settings['filter_fields_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'fieldsearch' in value['available_to']  }
-
-        self.vista_settings['order_by_fields_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'order_by' in value['available_to']  }
-
-        self.vista_settings['order_by_fields_available'] = self.vista_settings['order_by_fields_available'] + {  '-' + key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'order_by' in value['available_to']  }
-
-        self.vista_settings['columns_available'] = {  key  for ( key, value )  in vista_fields.items() if 'available_to' in value and 'columns' in value['available_to']  }
-
+        self.vista_settings['fields'] = vista_fields(Item, rels=True)
 
         self.vista_defaults = QueryDict(urlencode([
             ('filter__fieldname', ['status']),
@@ -485,48 +345,13 @@ class TicketList(PermissionRequiredMixin, ListView):
 
         context_data = super().get_context_data(**kwargs)
 
-        context_data['order_by_fields_available'] = []
-        for fieldname in self.vista_settings['order_by_fields_available']:
-            if fieldname > '' and fieldname[0] == '-':
-                context_data['order_by_fields_available'].append({ 'name':fieldname[1:], 'label':self.field_labels[fieldname[1:]] + ' [Reverse]'})
-            else:
-                context_data['order_by_fields_available'].append({ 'name':fieldname, 'label':self.field_labels[fieldname]})
+        vista_data = vista_context_data(self.vista_settings, self.vistaobj['querydict'])
+        context_data = {**context_data, **vista_data}
 
-        context_data['columns_available'] = [{ 'name':fieldname, 'label':self.field_labels[fieldname] } for fieldname in self.vista_settings['columns_available']]
-
-        options={
-            'item': {'type':'model', 'values':Item.objects.all() },
-            'mmodel': {'type':'model', 'values':Mmodel.objects.all() },
-            'user': {'type':'model', 'values':get_user_model().objects.all() },
-            'location': {'type':'model', 'values':Location.objects.all() },
-            'is_resolved':{'type':'boolean'}
-        }
-
-        context_data['filter_fields_available'] = [{ 'name':fieldname, 'label':self.field_labels[fieldname], 'options':options[fieldname] if fieldname in options else '' } for fieldname in self.vista_settings['filter_fields_available']]
-
-        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='sdcpeople.person').all() # for choosing saved vistas
+        context_data['vistas'] = Vista.objects.filter(user=self.request.user, model_name='libtekin.ticket').all() # for choosing saved vistas
 
         if self.request.POST.get('vista_name'):
             context_data['vista_name'] = self.request.POST.get('vista_name')
-
-        vista_querydict = self.vistaobj['querydict']
-
-        #putting the index before person name to make it easier for the template to iterate
-        context_data['filter'] = []
-        for indx in range( self.vista_settings['max_search_keys']):
-            cdfilter = {}
-            cdfilter['fieldname'] = vista_querydict.get('filter__fieldname__' + str(indx)) if 'filter__fieldname__' + str(indx) in vista_querydict else ''
-            cdfilter['op'] = vista_querydict.get('filter__op__' + str(indx) ) if 'filter__op__' + str(indx) in vista_querydict else ''
-            cdfilter['value'] = vista_querydict.get('filter__value__' + str(indx)) if 'filter__value__' + str(indx) in vista_querydict else ''
-            if cdfilter['op'] in ['in', 'range']:
-                cdfilter['value'] = vista_querydict.getlist('filter__value__' + str(indx)) if 'filter__value__'  + str(indx) in vista_querydict else []
-            context_data['filter'].append(cdfilter)
-
-        context_data['order_by'] = vista_querydict.getlist('order_by') if 'order_by' in vista_querydict else Item._meta.ordering
-
-        context_data['combined_text_search'] = vista_querydict.get('combined_text_search') if 'combined_text_search' in vista_querydict else ''
-
-        context_data['item_labels'] = { field.name: field.verbose_name.title() for field in Item._meta.get_fields() if type(field).__name__[-3:] != 'Rel' }
 
         return context_data
 
