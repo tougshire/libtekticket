@@ -62,7 +62,7 @@
 
     </div>
   </div>
-  {% comment %} <div class="pagination">
+  <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a id="a_first" href="?page=1">&laquo; first</a>
@@ -78,13 +78,13 @@
             <a id="a_last" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
-  </div> {% endcomment %}
+  </div>
 
 
 {% endblock %}
 {% block bottomscript %}
   {{ block.super }}
-  {% comment %} <script>
+  <script>
 
   for( paginator of ['a_first', 'a_previous', 'a_next', 'a_last']) {
     if(!(document.getElementById(paginator)==null) ) {
@@ -95,7 +95,7 @@
       });
     }
   }
-  </script> {% endcomment %}
+  </script>
 
   <script>
     addFilterInput("ctrl__filter__item__in")
