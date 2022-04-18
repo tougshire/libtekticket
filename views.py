@@ -20,7 +20,7 @@ from libtekin.models import Item, Location, Mmodel
 from tougshire_vistas.models import Vista
 from tougshire_vistas.views import (delete_vista, get_global_vista,
                                     get_latest_vista, make_vista,
-                                    retrieve_vista, default_vista, vista_context_data, vista_fields)
+                                    retrieve_vista, default_vista, vista_context_data, make_vista_fields)
 
 from .forms import TicketForm, TicketTicketNoteForm, TicketTicketNoteFormset
 from .models import History, Technician, Ticket, TicketNote
@@ -268,7 +268,7 @@ class TicketList(PermissionRequiredMixin, ListView):
             'fields':[],
         }
 
-        self.vista_settings['fields'] = vista_fields(Ticket, rels=True)
+        self.vista_settings['fields'] = make_vista_fields(Ticket, rels=True)
 
         self.vista_defaults = QueryDict(urlencode([
             ('filter__fieldname', ['is_resolved']),
