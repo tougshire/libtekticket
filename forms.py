@@ -37,8 +37,8 @@ class TicketForm(forms.ModelForm):
         ]
         widgets = {
             'item':ItemSelect,
-            'short_description':forms.TextInput(attrs={'class':'len75'}),
-            'long_description':forms.Textarea(attrs={'class':'len75'}),
+            'short_description':forms.TextInput(attrs={'class':'widthlong'}),
+            'long_description':forms.Textarea(attrs={'class':'widthlong'}),
         }
 
 

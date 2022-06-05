@@ -164,3 +164,22 @@
 .vista .control {
     display:flex;
 }
+
+div.field {
+    width:80%;
+}
+input.widthshort {
+    width:15%;
+}
+input.widthlong {
+    width:75%;
+}
+input.widthxlong {
+    width:100%;
+}
+textarea.widthlong {
+    width:75%;
+}
+textarea.widthxlong {
+    width:95%;
+}
