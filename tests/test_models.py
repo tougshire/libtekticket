@@ -14,7 +14,7 @@ class ProjectTests(TestCase):
         )
         cls.statusupdate_one = StatusUpdate.objects.create(
             project = cls.project_one,
-            text = 'Update to Project One'
+            maintext = 'Update to Project One'
         )
 
     def test_project_str_is_name(self):

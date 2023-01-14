@@ -78,7 +78,7 @@ def send_ticket_mail(ticket, request, is_new=False):
         ]
     )
     if ticket.ticketnote_set.all().exists:
-        mail_message = mail_message + "\nNotes:\n" + "\n".join([str(note.when) + ': ' + note.text + ' -- ' + str(note.submitted_by) for note in ticket.ticketnote_set.all()])
+        mail_message = mail_message + "\nNotes:\n" + "\n".join([str(note.when) + ': ' + note.maintext + ' -- ' + str(note.submitted_by) for note in ticket.ticketnote_set.all()])
 
     mail_html_message = "<br>\n".join(
         [
@@ -90,7 +90,7 @@ def send_ticket_mail(ticket, request, is_new=False):
         ]
     )
     if ticket.ticketnote_set.all().exists:
-        mail_html_message = mail_html_message + "<br>Notes:<br>\n" + "<br>\n".join([str(note.when) + ': ' + note.text + ' --' + str(note.submitted_by) for note in ticket.ticketnote_set.all()])
+        mail_html_message = mail_html_message + "<br>Notes:<br>\n" + "<br>\n".join([str(note.when) + ': ' + note.maintext + ' --' + str(note.submitted_by) for note in ticket.ticketnote_set.all()])
 
 
     mail_recipients = [email.strip() for email in ticket.recipient_emails.split(',')]

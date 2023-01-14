@@ -56,7 +56,7 @@
               {{ hiddenfield }}
             {% endfor %}
             {% include './_form_field.html' with field=ticketnoteform.when %}
-            {% include './_form_field.html' with field=ticketnoteform.text %}
+            {% include './_form_field.html' with field=ticketnoteform.maintext %}
             {% include './_form_field.html' with field=ticketnoteform.DELETE %}
           </div>
         {% else %}
@@ -65,7 +65,7 @@
               {{ hiddenfield }}
             {% endfor %}
             {% include './_form_field.html' with field=ticketnoteform.when %}
-            {% include './_form_field.html' with field=ticketnoteform.text %}
+            {% include './_form_field.html' with field=ticketnoteform.maintext %}
             {% include './_form_field.html' with field=ticketnoteform.DELETE %}
           </div>
         {% endif %}
@@ -76,7 +76,7 @@
         </tr>
         {% for ticketnote in object.ticketnote_set.all %}
           <tr id="tr_ticketnote_{{ ticketnote.id }}">
-            <td>{{ ticketnote.when }}</td><td>{{ ticketnote.text }}</td>
+            <td>{{ ticketnote.when }}</td><td>{{ ticketnote.maintext }}</td>
           </tr>
         {% endfor %}
       </table>

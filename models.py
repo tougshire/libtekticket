@@ -125,7 +125,7 @@ class TicketNote(models.Model):
         on_delete=models.CASCADE,
         help_text='The ticket to which this note applies',
     )
-    text = models.CharField(
+    maintext = models.CharField(
         'text',
         blank=True,
         max_length=255,

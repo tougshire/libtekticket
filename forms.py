@@ -47,11 +47,11 @@ class TicketTicketNoteForm(forms.ModelForm):
         model = TicketNote
         fields = [
             'when',
-            'text',
+            'maintext',
         ]
         widgets={
             'when':forms.DateTimeInput(format='%Y-%m-%dT%H:%M:%S',  attrs={'type':'datetime-local'} ),
-            'text':forms.TextInput(attrs={'class':'len100'})
+            'maintext':forms.TextInput(attrs={'class':'len100'})
         }
 
 TicketTicketNoteFormset = inlineformset_factory(Ticket, TicketNote, form=TicketTicketNoteForm, extra=10)

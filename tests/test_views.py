@@ -123,13 +123,13 @@ class ProjectCreatestatusupdateFormsetTests(TestCase):
             'statusupdate_set-MAX_NUM_FORMS':0,
             'statusupdate_set-0-when':'2021-11-19',
             'initial-statusupdate_set-0-when':'2021-11-19',
-            'statusupdate_set-0-text':'Project Update One',
+            'statusupdate_set-0-maintext':'Project Update One',
             'statusupdate_set-1-when':'2021-11-19',
             'initial-statusupdate_set-1-when':'2021-11-19',
-            'statusupdate_set-1-text':'',
+            'statusupdate_set-1-maintext':'',
             'statusupdate_set-2-when':'2021-11-19',
             'initial-statusupdate_set-2-when':'2021-11-19',
-            'statusupdate_set-2-text':'',
+            'statusupdate_set-2-maintext':'',
         })
         self.assertEqual(Project.objects.count(), 1)
         self.assertEqual(StatusUpdate.objects.count(), 1)
@@ -149,7 +149,7 @@ class ProjectUpdatestatusupdateFormsetTests(TestCase):
         )
         cls.statusupdate_one = StatusUpdate.objects.create(
             project = cls.project_one,
-            text = 'Project Note One',
+            maintext = 'Project Note One',
         )
 
     def test_project_post_with_statusupdate_update_with_superuser(self):
@@ -166,20 +166,20 @@ class ProjectUpdatestatusupdateFormsetTests(TestCase):
             'statusupdate_set-0-project':self.project_one.pk,
             'statusupdate_set-0-when':'2021-11-19',
             'initial-statusupdate_set-0-when':'2021-11-19',
-            'statusupdate_set-0-text':'Project Note One Updated',
+            'statusupdate_set-0-maintext':'Project Note One Updated',
 
             'statusupdate_set-1-Project':self.project_one.pk,
             'statusupdate_set-1-when':'2021-11-19',
             'initial-statusupdate_set-1-when':'2021-11-19',
-            'statusupdate_set-1-text':'Project Note Two',
+            'statusupdate_set-1-maintext':'Project Note Two',
 
             'statusupdate_set-2-Project':self.project_one.pk,
             'statusupdate_set-2-when':'2021-11-19',
             'initial-statusupdate_set-2-when':'2021-11-19',
-            'statusupdate_set-2-text':'',
+            'statusupdate_set-2-maintext':'',
             'statusupdate_set-3-when':'2021-11-19',
             'initial-statusupdate_set-3-when':'2021-11-19',
-            'statusupdate_set-3-text':'',
+            'statusupdate_set-3-maintext':'',
         })
         self.assertEqual(Project.objects.count(), 1)
         self.assertEqual(StatusUpdate.objects.count(), 2)
