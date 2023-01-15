@@ -145,7 +145,7 @@ class TicketNote(models.Model):
     )
 
     def __str__(self):
-        return self.text
+        return self.maintext
 
 class History(models.Model):
 
