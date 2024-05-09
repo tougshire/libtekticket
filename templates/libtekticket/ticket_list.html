@@ -7,27 +7,27 @@
   <div class="list">
     <div><a href="{% url 'libtekticket:ticket-create' %}">create</a></div>
       <div class="row rowhead">
-        {% include './_list_head.html' with field='' %}
+        {% include 'touglates/list_head.html' with field='' %}
         {% if 'item' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.item %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.item %}
         {% endif %}
         {% if 'location' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.location %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.location %}
         {% endif %}
         {% if 'short_description' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.short_description %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.short_description %}
         {% endif %}
         {% if 'urgency' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.urgency %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.urgency %}
         {% endif %}
         {% if 'submitted_by' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.submitted_by %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.submitted_by %}
         {% endif %}
         {% if 'when' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.when %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.when %}
         {% endif %}
         {% if 'is_resolved' in show_columns or not show_columns %}
-          {% include './_list_head.html' with field=ticket_labels.is_resolved %}
+          {% include 'touglates/list_head.html' with field=ticket_labels.is_resolved %}
         {% endif %}
       </div>
 
@@ -35,27 +35,27 @@
         <div class="row">
           <div class="listfield"><a href="{% url 'libtekticket:ticket-detail' item.pk %}">view</a></div>
           {% if 'item' in show_columns or not show_columns %}
-            {% include './_list_field.html' with field=item.item %}
+            {% include 'touglates/list_field.html' with field=item.item %}
           {% endif %}
           {% if 'location' in show_columns or not show_columns %}
-            {% include './_list_field.html' with field=item.location %}
+            {% include 'touglates/list_field.html' with field=item.location %}
           {% endif %}
           {% if 'short_description' in show_columns or not show_columns %}
-            {% include './_list_field.html' with field=item.short_description %}
+            {% include 'touglates/list_field.html' with field=item.short_description %}
           {% endif %}
           {% if 'urgency' in show_columns or not show_columns %}
-            {% include './_list_field.html' with field=item.urgency %}
+            {% include 'touglates/list_field.html' with field=item.urgency %}
           {% endif %}
           {% if 'submitted_by' in show_columns or not show_columns %}
-            {% include './_list_field.html' with field=item.submitted_by %}
+            {% include 'touglates/list_field.html' with field=item.submitted_by %}
           {% endif %}
           {% with when_formatted=item.when|date:'Y-m-d'  %}
             {% if 'when' in show_columns or not show_columns %}
-              {% include './_list_field.html' with field=when_formatted %}
+              {% include 'touglates/list_field.html' with field=when_formatted %}
             {% endif %}
           {% endwith %}
           {% if 'is_resolved' in show_columns or not show_columns %}
-            {% include './_list_field.html' with field=item.is_resolved|yesno %}
+            {% include 'touglates/list_field.html' with field=item.is_resolved|yesno %}
           {% endif %}
         </div>
       {% endfor %}

@@ -11,10 +11,10 @@
         {{ field }}
       {% endfor %}
       <div id="div_item">
-        {% include './_form_field.html' with field=form.maintext %}
+        {% include 'touglates/form_field.html' with field=form.maintext %}
       </div>
       <div id="div_location">
-        {% include './_form_field.html' with field=form.when %}
+        {% include 'touglates/form_field.html' with field=form.when %}
       </div>
       <button type="submit">Submit</button>
     </div>
